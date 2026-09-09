@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gamepad-tester.vercel.app/sitemap.xml
