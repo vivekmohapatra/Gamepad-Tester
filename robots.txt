@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# build sources, not pages
+Disallow: /_source/
+
 Sitemap: https://gamepad-tester.vercel.app/sitemap.xml
