@@ -30,7 +30,469 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap"></noscript>
-<link rel="stylesheet" href="assets/base.css">
+<style>
+/* base.css, inlined so the site needs no assets folder */
+/* ══════════════════════════════════════════════════════════════════════
+   Hardware Test Bench — shared shell
+   Type: Bricolage Grotesque (display) + Work Sans (everything else)
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── tokens ─────────────────────────────────────────────────────────── */
+:root{
+  --bg:#14181c;
+  --panel:#1e2328;
+  --panel-hi:#262c33;
+  --rule:#333b43;
+  --rule-soft:#272e35;
+  --text:#e9ecef;
+  --muted:#8f99a3;
+  --dim:#606a74;
+
+  --signal:#ff7a18;        /* digital: something is pressed */
+  --analog:#3ed0c4;        /* analog: something is moving */
+  --alert:#ff5252;
+
+  --plastic-hi:#d3d9df;
+  --plastic:#b3bbc3;
+  --plastic-lo:#8d959d;
+  --recess:#3a424a;
+
+  --gap:16px;
+  --r-panel:6px;
+  --r-chip:3px;
+
+  --display:"Bricolage Grotesque","Work Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --ui:"Work Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"Work Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--ui);
+  font-size:15px;
+  line-height:1.5;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4,p,ul,ol,figure{margin:0}
+ul{padding:0;list-style:none}
+button{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--analog);outline-offset:2px;border-radius:2px}
+
+h1,h2,h3,h4,.display{
+  font-family:var(--display);
+  font-weight:600;
+  font-variation-settings:"wdth" 96;
+  letter-spacing:-.012em;
+}
+
+/* readouts: Work Sans doing the job a mono used to, kept legible by
+   fixed-width right-aligned cells rather than a fourth typeface */
+.readout,.spec dd,.panel__note,.chip,.xy,.meter__val,.key__v,.sig,.boot__txt{
+  font-family:var(--mono);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.005em;
+}
+
+/* ── 12 column grid ─────────────────────────────────────────────────── */
+.wrap{
+  max-width:1340px;
+  margin:0 auto;
+  padding:0 clamp(14px,3vw,32px);
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:var(--gap);
+}
+.c3{grid-column:span 3}
+.c4{grid-column:span 4}
+.c5{grid-column:span 5}
+.c6{grid-column:span 6}
+.c7{grid-column:span 7}
+.c8{grid-column:span 8}
+.c12{grid-column:span 12}
+
+/* ── panel ──────────────────────────────────────────────────────────── */
+.panel{
+  background:var(--panel);
+  border:1px solid var(--rule-soft);
+  border-radius:var(--r-panel);
+  padding:18px;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+.panel__head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  padding-bottom:12px;
+  margin-bottom:16px;
+  border-bottom:1px solid var(--rule-soft);
+}
+.panel__title{font-size:14.5px;font-weight:600}
+.panel__note{font-size:11.5px;color:var(--dim);flex:none}
+
+/* ── masthead ───────────────────────────────────────────────────────── */
+.masthead{padding:26px 0 18px}
+.masthead .grid{align-items:end}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.brand svg{width:26px;height:26px;flex:none}
+.brand h1,.brand .brandname{
+  font-size:19px;font-weight:700;
+  font-variation-settings:"wdth" 92;
+  letter-spacing:-.018em;
+}
+.tagline{color:var(--muted);font-size:13.5px;margin-top:6px;max-width:52ch}
+
+.status{
+  display:flex;align-items:center;gap:9px;
+  font-family:var(--mono);font-size:12.5px;
+  color:var(--muted);
+  background:var(--panel);
+  border:1px solid var(--rule-soft);
+  border-radius:100px;
+  padding:7px 14px 7px 11px;
+  text-align:left;
+}
+.status__dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--dim);flex:none;
+  transition:background .18s,box-shadow .18s;
+}
+.is-live .status__dot{background:var(--analog);box-shadow:0 0 0 3px rgba(62,208,196,.16)}
+.is-live .status{color:var(--text)}
+.is-warn .status__dot{background:var(--alert);box-shadow:0 0 0 3px rgba(255,82,82,.16)}
+.status-wrap{display:flex;justify-content:flex-end}
+
+/* ── tool switcher ──────────────────────────────────────────────────── */
+.rail{
+  border-top:1px solid var(--rule-soft);
+  border-bottom:1px solid var(--rule-soft);
+  background:linear-gradient(180deg,rgba(38,44,51,.5),rgba(30,35,40,0));
+}
+.rail__inner{
+  display:flex;gap:2px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.rail__inner::-webkit-scrollbar{display:none}
+.rail a{
+  display:flex;align-items:center;gap:8px;
+  padding:13px 14px;
+  font-size:13.5px;
+  color:var(--muted);
+  text-decoration:none;
+  white-space:nowrap;
+  border-bottom:2px solid transparent;
+  transition:color .15s,border-color .15s,background .15s;
+}
+.rail a svg{width:16px;height:16px;flex:none;opacity:.75}
+.rail a:hover{color:var(--text);background:rgba(255,255,255,.025)}
+.rail a:hover svg{opacity:1}
+.rail a[aria-current="page"]{
+  color:var(--text);
+  border-bottom-color:var(--signal);
+  background:rgba(255,122,24,.06);
+}
+.rail a[aria-current="page"] svg{opacity:1;color:var(--signal)}
+
+/* ── spec list ──────────────────────────────────────────────────────── */
+.spec{display:grid;gap:0;margin:0}
+.spec div{
+  display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+  padding:9px 0;border-bottom:1px solid var(--rule-soft);
+}
+.spec div:last-child{border-bottom:0}
+.spec dt{color:var(--muted);font-size:13px;flex:none}
+.spec dd{
+  margin:0;font-size:12.5px;
+  text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* ── controls ───────────────────────────────────────────────────────── */
+.ctrl{display:grid;gap:7px;margin-bottom:16px}
+.ctrl__row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.ctrl label{font-size:13px;color:var(--muted)}
+.ctrl output{font-family:var(--mono);font-size:12.5px}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;cursor:pointer;
+}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--rule);border-radius:100px}
+input[type=range]::-moz-range-track{height:4px;background:var(--rule);border-radius:100px}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+  background:var(--text);margin-top:-5px;border:0;
+}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:var(--text)}
+
+select,input[type=text]{
+  width:100%;
+  background:var(--panel-hi);
+  border:1px solid var(--rule);
+  border-radius:var(--r-chip);
+  color:var(--text);
+  font:inherit;
+  font-size:13px;
+  padding:9px 10px;
+}
+select{cursor:pointer}
+
+.btnrow{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:auto}
+.btn{
+  background:var(--panel-hi);border:1px solid var(--rule);
+  border-radius:var(--r-chip);padding:10px 14px;
+  font-size:13.5px;font-weight:500;cursor:pointer;
+  transition:border-color .15s,background .15s,color .15s;
+}
+.btn:hover:not(:disabled){border-color:var(--dim)}
+.btn--go{background:var(--signal);border-color:var(--signal);color:#14181c;font-weight:600}
+.btn--go:hover:not(:disabled){background:#ff8c38;border-color:#ff8c38}
+.btn--wide{width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.on{border-color:var(--analog);color:var(--analog);background:rgba(62,208,196,.09)}
+
+/* ── meters ─────────────────────────────────────────────────────────── */
+.meters{display:grid;gap:14px}
+.meter{display:grid;grid-template-columns:52px 1fr 56px;align-items:center;gap:12px}
+.meter b{font-size:12.5px;font-weight:500;color:var(--muted)}
+.meter__track{height:9px;background:var(--panel-hi);border:1px solid var(--rule);border-radius:100px;overflow:hidden}
+.meter__fill{height:100%;width:0%;background:var(--signal);border-radius:100px;transition:width .04s linear}
+.meter__fill--analog{background:var(--analog)}
+.meter__val{font-size:12px;text-align:right;color:var(--text)}
+
+.lamp{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:9px;border:1px solid var(--rule);border-radius:var(--r-chip);
+  background:var(--panel-hi);font-family:var(--mono);font-size:12.5px;color:var(--muted);
+}
+.lamp i{width:7px;height:7px;border-radius:50%;background:var(--dim);font-style:normal;flex:none}
+.lamp.on{color:var(--text);border-color:rgba(255,122,24,.5)}
+.lamp.on i{background:var(--signal);box-shadow:0 0 6px var(--signal)}
+.lamp.on--analog{color:var(--text);border-color:rgba(62,208,196,.5)}
+.lamp.on--analog i{background:var(--analog);box-shadow:0 0 6px var(--analog)}
+
+/* ── coverage chips + tally ─────────────────────────────────────────── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chip{
+  font-size:11.5px;
+  padding:4px 8px;border-radius:var(--r-chip);
+  border:1px solid var(--rule);color:var(--dim);
+  transition:border-color .15s,color .15s,background .15s;
+}
+.chip.done{border-color:rgba(62,208,196,.45);color:var(--analog);background:rgba(62,208,196,.08)}
+.tally{display:flex;align-items:baseline;gap:9px;margin-bottom:14px}
+.tally strong{
+  font-family:var(--display);font-size:28px;font-weight:600;
+  font-variation-settings:"wdth" 88;letter-spacing:-.03em;
+}
+.tally span{font-size:13px;color:var(--muted)}
+
+.note{
+  display:grid;gap:8px;padding:12px;
+  background:var(--panel-hi);border-radius:var(--r-chip);
+  border-left:2px solid var(--rule);
+  font-size:12.5px;color:var(--muted);line-height:1.45;
+}
+.note.warn{border-left-color:var(--alert)}
+.note.warn .note__msg{color:#ffa3a3}
+.note.ok{border-left-color:var(--analog)}
+.note__row{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:12.5px;color:var(--text)}
+.note__row span{color:var(--muted);font-family:var(--ui);font-size:13px}
+.note__row em,.spec dd em,.tally em{font-style:normal}
+
+/* ── permission / connect prompt ────────────────────────────────────── */
+.prompt{
+  position:absolute;inset:0;
+  display:grid;place-content:center;justify-items:center;
+  gap:14px;text-align:center;
+  background:linear-gradient(180deg,rgba(30,35,40,.72),rgba(30,35,40,.94));
+  backdrop-filter:blur(2px);
+  border-radius:4px;
+  padding:24px;
+}
+.prompt[hidden]{display:none}
+.prompt__ring{
+  width:52px;height:52px;border-radius:50%;
+  border:2px solid var(--rule);
+  border-top-color:var(--signal);
+  animation:spin 1.4s cubic-bezier(.6,0,.4,1) infinite;
+}
+.prompt h2{font-size:18px;font-weight:600}
+.prompt p{color:var(--muted);font-size:13.5px;max-width:36ch}
+.prompt kbd{
+  font-family:var(--mono);font-size:12px;
+  background:var(--panel-hi);border:1px solid var(--rule);
+  border-radius:var(--r-chip);padding:2px 6px;color:var(--text);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ── how to use ─────────────────────────────────────────────────────── */
+.section{padding:52px 0 0}
+.section__head{margin-bottom:22px;max-width:62ch}
+.section__head h2{font-size:23px;font-weight:600;font-variation-settings:"wdth" 90;letter-spacing:-.02em}
+.section__head p{color:var(--muted);font-size:14px;margin-top:8px}
+
+.steps{counter-reset:step;display:grid;gap:var(--gap)}
+.step{
+  position:relative;
+  background:var(--panel);
+  border:1px solid var(--rule-soft);
+  border-radius:var(--r-panel);
+  padding:18px 18px 18px 18px;
+}
+.step::before{
+  counter-increment:step;
+  content:counter(step,decimal-leading-zero);
+  display:block;
+  font-family:var(--mono);font-size:11.5px;
+  color:var(--signal);
+  margin-bottom:10px;
+}
+.step h3{font-size:15px;font-weight:600;margin-bottom:6px}
+.step p{color:var(--muted);font-size:13.5px}
+.step p + p{margin-top:8px}
+.step code,.prose code{
+  font-family:var(--mono);font-size:12.5px;
+  background:var(--panel-hi);border:1px solid var(--rule);
+  border-radius:var(--r-chip);padding:1px 5px;color:var(--text);
+}
+
+/* ── faq ────────────────────────────────────────────────────────────── */
+.faq{display:grid;gap:0;border-top:1px solid var(--rule-soft)}
+.faq details{border-bottom:1px solid var(--rule-soft)}
+.faq summary{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:16px 2px;
+  cursor:pointer;
+  font-family:var(--display);
+  font-size:15.5px;font-weight:600;
+  font-variation-settings:"wdth" 96;
+  letter-spacing:-.008em;
+  list-style:none;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{
+  content:"";
+  width:9px;height:9px;flex:none;
+  margin-left:auto;margin-top:7px;
+  border-right:1.6px solid var(--dim);
+  border-bottom:1.6px solid var(--dim);
+  transform:rotate(45deg);
+  transition:transform .18s ease,border-color .18s;
+}
+.faq details[open] summary::after{transform:rotate(-135deg);border-color:var(--signal)}
+.faq summary:hover::after{border-color:var(--text)}
+.faq__a{padding:0 34px 18px 2px;color:var(--muted);font-size:14px;max-width:72ch}
+.faq__a p + p{margin-top:10px}
+.faq__a a{color:var(--analog)}
+.faq__a ul{display:grid;gap:6px;margin-top:10px}
+.faq__a li{padding-left:16px;position:relative}
+.faq__a li::before{
+  content:"";position:absolute;left:2px;top:9px;
+  width:5px;height:1px;background:var(--dim);
+}
+
+/* ── tool cards ─────────────────────────────────────────────────────── */
+.tools{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gap)}
+.tool{
+  grid-column:span 4;
+  display:flex;flex-direction:column;gap:9px;
+  background:var(--panel);
+  border:1px solid var(--rule-soft);
+  border-radius:var(--r-panel);
+  padding:17px;
+  text-decoration:none;
+  transition:border-color .15s,background .15s;
+}
+.tool:hover{border-color:var(--rule);background:var(--panel-hi)}
+.tool__top{display:flex;align-items:center;gap:10px}
+.tool__top svg{width:18px;height:18px;flex:none;color:var(--signal)}
+.tool__top b{font-family:var(--display);font-size:15px;font-weight:600;font-variation-settings:"wdth" 96}
+.tool p{color:var(--muted);font-size:13px}
+.tool[aria-current="page"]{border-color:rgba(255,122,24,.4)}
+.tool[aria-current="page"]::after{content:"You are here";font-size:11.5px;color:var(--signal);font-family:var(--mono)}
+
+/* ── prose band ─────────────────────────────────────────────────────── */
+.info{padding:44px 0 8px}
+.info h2{font-size:16px;font-weight:600;margin-bottom:10px}
+.info p{color:var(--muted);font-size:14px;max-width:62ch}
+.info p + p{margin-top:10px}
+.info a{color:var(--analog)}
+
+.prose{max-width:68ch;color:var(--muted);font-size:14.5px}
+.prose p + p{margin-top:12px}
+.prose h3{color:var(--text);font-size:16px;margin:22px 0 8px}
+.prose a{color:var(--analog)}
+
+/* ── footer ─────────────────────────────────────────────────────────── */
+footer{
+  margin-top:56px;padding:26px 0 36px;
+  border-top:1px solid var(--rule-soft);
+}
+footer .grid{align-items:center}
+.sig{font-size:12.5px;color:var(--dim)}
+.sig b{color:var(--muted);font-weight:500}
+.foot-note{font-size:12.5px;color:var(--dim);justify-self:end;text-align:right}
+.foot-links{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:16px}
+.foot-links a{font-size:13px;color:var(--muted);text-decoration:none}
+.foot-links a:hover{color:var(--text);text-decoration:underline}
+
+/* ── preloader ──────────────────────────────────────────────────────── */
+.boot{
+  position:fixed;inset:0;z-index:50;
+  background:var(--bg);
+  display:grid;place-content:center;justify-items:center;gap:22px;
+  transition:opacity .45s ease,visibility .45s;
+}
+.boot.done{opacity:0;visibility:hidden}
+.boot svg{width:132px;height:auto}
+.boot .trace{
+  fill:none;stroke:var(--plastic);stroke-width:2.5;
+  stroke-linejoin:round;stroke-linecap:round;
+  stroke-dasharray:1;stroke-dashoffset:1;
+  animation:draw .8s cubic-bezier(.5,0,.2,1) forwards;
+}
+.boot .spark{opacity:0;animation:spark .4s ease .6s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes spark{to{opacity:1}}
+.boot__bar{width:172px;height:2px;background:var(--rule-soft);overflow:hidden}
+.boot__bar i{display:block;height:100%;width:0;background:var(--signal)}
+.boot__txt{font-size:11.5px;color:var(--dim);display:flex;gap:12px}
+
+/* ── responsive ─────────────────────────────────────────────────────── */
+@media (max-width:1080px){
+  .c8{grid-column:span 12}
+  .c4{grid-column:span 6}
+  .c7,.c5{grid-column:span 12}
+  .status-wrap{justify-content:flex-start}
+  .tool{grid-column:span 6}
+}
+@media (max-width:720px){
+  .c3,.c4,.c6{grid-column:span 12}
+  .panel{padding:15px}
+  .tool{grid-column:span 12}
+  .foot-note{justify-self:start;text-align:left}
+  .masthead{padding:20px 0 14px}
+  .section{padding:40px 0 0}
+  .section__head h2{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+</style>
 <style>
 .stage{position:relative}
 .scope{margin:0 0 14px}
@@ -272,7 +734,7 @@ gtag('config', 'G-C9C7L3L68W');
 <header class="masthead">
   <div class="wrap grid">
     <div class="c7">
-      <a class="brand" href="index.html">
+      <a class="brand" href="/">
         <svg viewBox="0 0 32 32" aria-hidden="true">
           <path d="M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z" fill="#c9cfd6"/>
           <circle cx="21.5" cy="16.5" r="1.9" fill="#ff7a18"/>
@@ -295,13 +757,13 @@ gtag('config', 'G-C9C7L3L68W');
 
 <nav class="rail" aria-label="Hardware tests">
   <div class="wrap rail__inner">
-      <a href="index.html"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><span>Gamepad</span></a>
-      <a href="microphone-test.html" aria-current="page"><svg aria-hidden="true"><use href="#i-mic"></use></svg><span>Microphone</span></a>
-      <a href="speaker-test.html"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><span>Speakers</span></a>
-      <a href="keyboard-test.html"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><span>Keyboard</span></a>
-      <a href="mouse-test.html"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><span>Mouse</span></a>
-      <a href="webcam-test.html"><svg aria-hidden="true"><use href="#i-camera"></use></svg><span>Webcam</span></a>
-      <a href="screen-test.html"><svg aria-hidden="true"><use href="#i-display"></use></svg><span>Screen</span></a>
+      <a href="/"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><span>Gamepad</span></a>
+      <a href="/microphone-test" aria-current="page"><svg aria-hidden="true"><use href="#i-mic"></use></svg><span>Microphone</span></a>
+      <a href="/speaker-test"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><span>Speakers</span></a>
+      <a href="/keyboard-test"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><span>Keyboard</span></a>
+      <a href="/mouse-test"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><span>Mouse</span></a>
+      <a href="/webcam-test"><svg aria-hidden="true"><use href="#i-camera"></use></svg><span>Webcam</span></a>
+      <a href="/screen-test"><svg aria-hidden="true"><use href="#i-display"></use></svg><span>Screen</span></a>
   </div>
 </nav>
 
@@ -563,27 +1025,27 @@ gtag('config', 'G-C9C7L3L68W');
       <p>Every tool runs in this tab, reads your hardware directly through the browser, and stores nothing.</p>
     </div>
     <div class="tools">
-    <a class="tool" href="index.html">
+    <a class="tool" href="/">
       <span class="tool__top"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><b>Gamepad</b></span>
       <p>Check buttons, analog sticks, triggers, the D-pad and rumble, and measure stick drift.</p>
     </a>
-    <a class="tool" href="speaker-test.html">
+    <a class="tool" href="/speaker-test">
       <span class="tool__top"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><b>Speakers</b></span>
       <p>Left and right channel checks, a tone generator, and a 20 Hz to 20 kHz hearing sweep.</p>
     </a>
-    <a class="tool" href="keyboard-test.html">
+    <a class="tool" href="/keyboard-test">
       <span class="tool__top"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><b>Keyboard</b></span>
       <p>Light up a full layout key by key, read live key codes, and test N-key rollover.</p>
     </a>
-    <a class="tool" href="mouse-test.html">
+    <a class="tool" href="/mouse-test">
       <span class="tool__top"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><b>Mouse</b></span>
       <p>Buttons, scroll wheel, movement trace, polling rate in Hz, and a double-click chatter check.</p>
     </a>
-    <a class="tool" href="webcam-test.html">
+    <a class="tool" href="/webcam-test">
       <span class="tool__top"><svg aria-hidden="true"><use href="#i-camera"></use></svg><b>Webcam</b></span>
       <p>Live preview, real resolution and measured frame rate, camera switching and snapshots.</p>
     </a>
-    <a class="tool" href="screen-test.html">
+    <a class="tool" href="/screen-test">
       <span class="tool__top"><svg aria-hidden="true"><use href="#i-display"></use></svg><b>Screen</b></span>
       <p>Dead pixel hunt, backlight bleed check, gradient banding, and a measured refresh rate.</p>
     </a>
@@ -594,13 +1056,13 @@ gtag('config', 'G-C9C7L3L68W');
 <footer>
   <div class="wrap">
     <nav class="foot-links" aria-label="All tests">
-      <a href="index.html">Gamepad test</a>
-      <a href="index.html">Gamepad</a>
-      <a href="speaker-test.html">Speakers</a>
-      <a href="keyboard-test.html">Keyboard</a>
-      <a href="mouse-test.html">Mouse</a>
-      <a href="webcam-test.html">Webcam</a>
-      <a href="screen-test.html">Screen</a>
+      <a href="/">Gamepad test</a>
+      <a href="/">Gamepad</a>
+      <a href="/speaker-test">Speakers</a>
+      <a href="/keyboard-test">Keyboard</a>
+      <a href="/mouse-test">Mouse</a>
+      <a href="/webcam-test">Webcam</a>
+      <a href="/screen-test">Screen</a>
     </nav>
     <div class="grid">
       <p class="sig c6"><b>Melted Code</b> — browser hardware diagnostics</p>
