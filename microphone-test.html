@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Microphone Test — Check Your Mic Online With Live Waveform &amp; Playback</title>
+<meta name="description" content="Free online microphone test. See a live waveform and level meter, check your input level in dBFS, record a few seconds and play it straight back. Works with USB, headset and built-in mics. Nothing is uploaded.">
+<link rel="canonical" href="https://gamepad-tester.vercel.app/microphone-test">
+<meta name="theme-color" content="#14181C">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hardware Test Bench">
+<meta property="og:title" content="Microphone Test — Check Your Mic Online With Live Waveform &amp; Playback">
+<meta property="og:description" content="Free online microphone test. See a live waveform and level meter, check your input level in dBFS, record a few seconds and play it straight back. Works with USB, headset and built-in mics. Nothing is uploaded.">
+<meta property="og:url" content="https://gamepad-tester.vercel.app/microphone-test">
+<meta property="og:image" content="https://gamepad-tester.vercel.app/og.png">
+<meta property="og:image:alt" content="A dark instrument panel lighting up as hardware is tested.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Microphone Test — Check Your Mic Online With Live Waveform &amp; Playback">
+<meta name="twitter:description" content="Free online microphone test. See a live waveform and level meter, check your input level in dBFS, record a few seconds and play it straight back. Works with USB, headset and built-in mics. Nothing is uploaded.">
+<meta name="twitter:image" content="https://gamepad-tester.vercel.app/og.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap"></noscript>
+<link rel="stylesheet" href="/assets/base.css">
+<style>
+.stage{position:relative}
+.scope{margin:0 0 14px}
+.scope:last-of-type{margin-bottom:0}
+.scope canvas{
+  display:block;width:100%;height:auto;
+  background:var(--panel-hi);
+  border:1px solid var(--rule-soft);
+  border-radius:var(--r-chip);
+}
+.scope figcaption{
+  font-size:12px;color:var(--dim);
+  padding-top:8px;
+}
+.scope--short canvas{height:auto}
+
+.scale{
+  display:flex;justify-content:space-between;
+  font-size:11px;color:var(--dim);
+  padding:8px 56px 0 52px;
+}
+
+.switch{
+  display:flex;gap:10px;align-items:flex-start;
+  font-size:13px;color:var(--muted);
+  margin-bottom:16px;cursor:pointer;
+}
+.switch input{
+  appearance:none;-webkit-appearance:none;
+  width:15px;height:15px;flex:none;margin:2px 0 0;
+  border:1px solid var(--rule);border-radius:3px;
+  background:var(--panel-hi);cursor:pointer;
+  transition:background .15s,border-color .15s;
+}
+.switch input:checked{background:var(--signal);border-color:var(--signal)}
+.switch input:checked::after{
+  content:"";display:block;
+  width:4px;height:8px;margin:1px 0 0 4px;
+  border:solid #14181c;border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+}
+.switch:hover input{border-color:var(--dim)}
+
+audio{width:100%;margin-bottom:14px;filter:invert(.92) hue-rotate(180deg)}
+audio[hidden]{display:none}
+.note__msg{font-size:12.5px;color:var(--muted);line-height:1.45}
+.note.warn .note__msg{color:#ffa3a3}
+.note.ok .note__msg{color:#a8e8e0}
+
+.btn--rec{background:var(--alert);border-color:var(--alert);color:#14181c}
+.btn--rec:hover:not(:disabled){background:#ff6b6b;border-color:#ff6b6b}
+
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://gamepad-tester.vercel.app/#website",
+      "url": "https://gamepad-tester.vercel.app/",
+      "name": "Hardware Test Bench",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://gamepad-tester.vercel.app/microphone-test#app",
+      "name": "Microphone Test",
+      "url": "https://gamepad-tester.vercel.app/microphone-test",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Windows, macOS, Linux, Android, iOS, ChromeOS",
+      "browserRequirements": "Modern browser, no plugins or downloads",
+      "description": "Browser tool that reads your microphone so you can see a live waveform, measure input level and noise floor, and record a sample to play back.",
+      "isPartOf": {
+        "@id": "https://gamepad-tester.vercel.app/#website"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://gamepad-tester.vercel.app/microphone-test#crumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://gamepad-tester.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Microphone",
+          "item": "https://gamepad-tester.vercel.app/microphone-test"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://gamepad-tester.vercel.app/microphone-test#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why does the page ask for permission?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Browsers will not open a microphone without an explicit prompt, and that prompt is the only way this page can read audio at all. Permission applies to this tab only and ends when you close it or press stop. If you dismissed the prompt by accident, click the padlock or camera icon in the address bar and reset the microphone permission for this site, then reload."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "My microphone shows a flat line. What now?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Work through these in order: Check the right device is selected in the list, not a disconnected headset or a virtual cable.Check the physical mute switch on your headset, and the mute key on your keyboard.On Windows, open Settings, Privacy and security, Microphone, and confirm your browser is allowed.On macOS, open System Settings, Privacy and Security, Microphone, and do the same.Close Zoom, Teams, Discord and OBS, which can hold the device exclusively."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What microphone level should I aim for?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Speaking normally, peaks around -12 dBFS to -6 dBFS give you clear speech with room left for a laugh or a raised voice. Average level sitting near -18 dBFS is healthy. If peaks hit 0 dB the signal is clipping and permanently distorted, so turn the input gain down. If you cannot get above about -30 dBFS, turn gain up or move closer."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a noise floor and what is a good one?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The noise floor is the level of your room and equipment when nobody is speaking: fans, traffic, air conditioning, and hiss from the microphone itself. Below about -60 dBFS is quiet enough that nobody will notice. Around -50 dBFS is audible on a call. Above -40 dBFS people will hear your room before they hear you, and no amount of software noise removal fixes that cleanly."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I test a USB, headset or Bluetooth microphone?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Anything your operating system lists as an input appears in the device list, including USB condenser mics, headset booms, webcam mics, audio interfaces and Bluetooth earbuds. Choose the device before you start, or switch it mid-test and the page will restart the stream on the new input."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does my Bluetooth headset sound terrible when the mic is on?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Most Bluetooth headsets cannot send and receive high quality audio at the same time. The moment the microphone opens, the connection drops to a narrow voice profile, music quality collapses and everything sounds thin and muffled. That is a limitation of the Bluetooth profile rather than a fault. A USB or wired headset avoids it entirely, which is why it is the usual recommendation for calls and recording."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does my voice sound quiet even at full volume?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Automatic gain control is the usual cause. Browsers apply it by default to keep call levels even, and it fights any gain you set yourself. Distance is the other cause, and it matters more than people expect: doubling your distance from the mic cuts the level by roughly 6 dB. A microphone a hand's width from your mouth will always beat one across the desk."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my recording uploaded anywhere?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The waveform, the meters and the recording all stay in your browser's memory. Nothing is written to a server, nothing is stored on disk unless you save it yourself, and reloading the page discards it."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which browsers can test a microphone?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Chrome, Edge, Firefox, Safari and Opera all support microphone access on desktop, and Chrome and Safari support it on Android and iOS. Access requires a secure connection, so a page served over plain HTTP cannot open your microphone at all. That is a browser rule rather than a site setting."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this test whether other people can hear me?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It tests everything up to the moment your voice leaves the browser: the device, the driver, the level and the sound quality. If the waveform moves and the playback sounds right, your microphone is working. If it works here but not in a specific app, the fault is that app's device selection or permissions rather than your hardware, which is a much quicker thing to fix."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "@id": "https://gamepad-tester.vercel.app/microphone-test#howto",
+      "name": "How to use the microphone test",
+      "totalTime": "PT2M",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Allow the microphone",
+          "text": "Press Start microphone. Your browser asks for permission, and the recording indicator in the tab or address bar confirms it is live. If you have more than one input, pick the right one from the device list. The list only fills in with real names after permission is granted.",
+          "url": "https://gamepad-tester.vercel.app/microphone-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Talk and watch the level",
+          "text": "Speak normally at your usual distance. The waveform should move clearly and the peak reading should land somewhere around -12 dBFS to -6 dBFS. Flat line means nothing is arriving. A meter pinned at 0 dB means you are clipping, which is the distortion people hear as crackling on calls.",
+          "url": "https://gamepad-tester.vercel.app/microphone-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Record and listen back",
+          "text": "Stop talking for a moment to let the noise floor settle, then record a few seconds and play it back. This is the only reliable way to judge hiss, echo and room noise. If the playback sounds distant or hollow, move closer, or check you are not recording from a laptop mic while wearing a headset.",
+          "url": "https://gamepad-tester.vercel.app/microphone-test#how-to"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C9C7L3L68W"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-C9C7L3L68W');
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8a4 4 0 0 1 3.9 3.1l1 4.4c.4 1.9-2 2.9-3 1.3l-1.6-2.5a1.5 1.5 0 0 0-1.3-.7H8.9a1.5 1.5 0 0 0-1.3.7l-1.5 2.5c-1 1.6-3.4.6-3-1.3l1-4.4A4 4 0 0 1 8 9z"/><path d="M8.2 11.5v2.2M7.1 12.6h2.2"/><circle cx="15.8" cy="12.6" r=".95" fill="currentColor" stroke="none"/></symbol><symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9.5" y="2.8" width="5" height="10.4" rx="2.5"/><path d="M5.6 11.2a6.4 6.4 0 0 0 12.8 0"/><path d="M12 17.6v3.6"/></symbol><symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 9.4h3l4.4-3.7a.8.8 0 0 1 1.3.6v11.4a.8.8 0 0 1-1.3.6l-4.4-3.7h-3a.9.9 0 0 1-.9-.9v-3.4a.9.9 0 0 1 .9-.9z"/><path d="M16.6 9.2a4 4 0 0 1 0 5.6M19.2 6.6a7.6 7.6 0 0 1 0 10.8"/></symbol><symbol id="i-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="6" width="19.2" height="12" rx="2"/><path d="M6 9.6h.01M9.6 9.6h.01M13.2 9.6h.01M16.8 9.6h.01M6 12.9h.01M9.6 12.9h.01M13.2 12.9h.01M16.8 12.9h.01M8.2 15.7h7.6"/></symbol><symbol id="i-mouse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6.4" y="2.5" width="11.2" height="19" rx="5.6"/><path d="M12 6.4v3.8"/></symbol><symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.6 8.6h3.2l1.5-2.6h9.4l1.5 2.6h3.2a.9.9 0 0 1 .9.9v8a.9.9 0 0 1-.9.9H2.6a.9.9 0 0 1-.9-.9v-8a.9.9 0 0 1 .9-.9z"/><circle cx="12" cy="13.4" r="3.4"/></symbol><symbol id="i-display" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="4" width="19.2" height="13" rx="2"/><path d="M9 21.2h6M12 17.2v4"/></symbol></defs></svg>
+
+<header class="masthead">
+  <div class="wrap grid">
+    <div class="c7">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z" fill="#c9cfd6"/>
+          <circle cx="21.5" cy="16.5" r="1.9" fill="#ff7a18"/>
+          <rect x="8" y="15.4" width="6" height="2.2" rx="1.1" fill="#14181c"/>
+          <rect x="9.9" y="13.5" width="2.2" height="6" rx="1.1" fill="#14181c"/>
+        </svg>
+        <span class="brandname">Hardware Test Bench</span>
+      </a>
+      <h1>Microphone test</h1>
+      <p class="tagline">Watch your voice arrive as a waveform, check the level, then record a few seconds and hear yourself back.</p>
+    </div>
+    <div class="c5 status-wrap">
+      <p class="status" id="status" role="status" aria-live="polite">
+        <span class="status__dot" aria-hidden="true"></span>
+        <span id="statusText">Microphone off</span>
+      </p>
+    </div>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Hardware tests">
+  <div class="wrap rail__inner">
+      <a href="/"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><span>Gamepad</span></a>
+      <a href="/microphone-test" aria-current="page"><svg aria-hidden="true"><use href="#i-mic"></use></svg><span>Microphone</span></a>
+      <a href="/speaker-test"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><span>Speakers</span></a>
+      <a href="/keyboard-test"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><span>Keyboard</span></a>
+      <a href="/mouse-test"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><span>Mouse</span></a>
+      <a href="/webcam-test"><svg aria-hidden="true"><use href="#i-camera"></use></svg><span>Webcam</span></a>
+      <a href="/screen-test"><svg aria-hidden="true"><use href="#i-display"></use></svg><span>Screen</span></a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- scope -->
+    <section class="panel stage c8" aria-labelledby="h-scope">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-scope">Live input</h2>
+        <span class="panel__note" id="fps">— fps</span>
+      </div>
+
+      <figure class="scope">
+        <canvas id="wave" width="900" height="260" role="img"
+                aria-label="Live waveform of your microphone input"></canvas>
+        <figcaption>Waveform — the shape of your voice as it arrives</figcaption>
+      </figure>
+
+      <figure class="scope scope--short">
+        <canvas id="spec" width="900" height="150" role="img"
+                aria-label="Frequency spectrum of your microphone input"></canvas>
+        <figcaption>Spectrum — low notes on the left, high notes on the right</figcaption>
+      </figure>
+
+      <div class="prompt" id="prompt">
+        <div class="prompt__ring" aria-hidden="true"></div>
+        <h2>Your microphone is off</h2>
+        <p>Nothing is captured until you start it, and nothing is ever sent anywhere.</p>
+        <button class="btn btn--go" id="startTop">Start microphone</button>
+      </div>
+    </section>
+
+    <!-- device -->
+    <section class="panel c4" aria-labelledby="h-dev">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-dev">Input device</h2>
+        <span class="panel__note" id="devNote">not started</span>
+      </div>
+
+      <div class="ctrl">
+        <label for="devices">Microphone</label>
+        <select id="devices" disabled>
+          <option>Start the microphone to list devices</option>
+        </select>
+      </div>
+
+      <label class="switch">
+        <input type="checkbox" id="raw">
+        <span>Raw input — turn off echo cancelling, noise removal and auto gain</span>
+      </label>
+
+      <dl class="spec">
+        <div><dt>Sample rate</dt><dd id="dRate">—</dd></div>
+        <div><dt>Channels</dt><dd id="dCh">—</dd></div>
+        <div><dt>Echo cancelling</dt><dd id="dEcho">—</dd></div>
+        <div><dt>Noise removal</dt><dd id="dNs">—</dd></div>
+        <div><dt>Auto gain</dt><dd id="dAgc">—</dd></div>
+      </dl>
+
+      <div class="btnrow">
+        <button class="btn btn--go" id="start">Start microphone</button>
+        <button class="btn" id="stop" disabled>Stop</button>
+      </div>
+    </section>
+
+    <!-- level -->
+    <section class="panel c4" aria-labelledby="h-level">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-level">Level</h2>
+        <span class="panel__note">dBFS</span>
+      </div>
+      <div class="meters">
+        <div class="meter">
+          <b>Peak</b>
+          <div class="meter__track"><div class="meter__fill" id="peakFill"></div></div>
+          <span class="meter__val" id="peakVal">—</span>
+        </div>
+        <div class="meter">
+          <b>Average</b>
+          <div class="meter__track"><div class="meter__fill meter__fill--analog" id="rmsFill"></div></div>
+          <span class="meter__val" id="rmsVal">—</span>
+        </div>
+      </div>
+
+      <p class="scale" aria-hidden="true"><span>-60</span><span>-40</span><span>-20</span><span>-6</span><span>0</span></p>
+
+      <div class="note" id="levelNote" style="margin-top:16px">
+        <p class="note__row"><span>Loudest peak</span><em id="peakHold">—</em></p>
+        <p class="note__row"><span>Clipped frames</span><em id="clips">0</em></p>
+        <p class="note__msg" id="levelMsg">Speak normally. Peaks between -12 and -6 dBFS are the target.</p>
+      </div>
+    </section>
+
+    <!-- noise -->
+    <section class="panel c4" aria-labelledby="h-noise">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-noise">Room noise</h2>
+        <button class="btn" id="reNoise" style="padding:4px 9px;font-size:12px;align-self:center">Re-measure</button>
+      </div>
+      <p class="tally"><strong id="floorVal">—</strong><span>dBFS noise floor</span></p>
+      <div class="note" id="floorNote">
+        <p class="note__msg" id="floorMsg">Stay quiet for a few seconds and the floor settles. Below -60 dBFS nobody will hear your room.</p>
+      </div>
+      <dl class="spec" style="margin-top:auto">
+        <div><dt>Signal above noise</dt><dd id="dSnr">—</dd></div>
+        <div><dt>Listening for</dt><dd id="dElapsed">—</dd></div>
+      </dl>
+    </section>
+
+    <!-- recorder -->
+    <section class="panel c4" aria-labelledby="h-rec">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-rec">Record and listen back</h2>
+        <span class="panel__note" id="recNote">up to 15 s</span>
+      </div>
+      <p class="prose" style="font-size:13.5px;margin-bottom:16px">
+        Say a sentence at your normal distance, then play it back. Hearing yourself is the only
+        reliable way to judge hiss, echo and room noise.
+      </p>
+      <audio id="player" controls preload="none" hidden></audio>
+      <div class="btnrow">
+        <button class="btn btn--go" id="rec" disabled>Record</button>
+        <button class="btn" id="dl" disabled>Save</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="info grid">
+    <article class="c4">
+      <h2>Reading the level meter</h2>
+      <p>0 dBFS is the loudest a digital signal can go, so every reading here is a negative number
+      counting down from that ceiling. Speaking normally, you want peaks landing between -12 and
+      -6 dBFS, which leaves headroom for a laugh without touching the limit.</p>
+    </article>
+    <article class="c4">
+      <h2>Why raw input matters</h2>
+      <p>Browsers apply echo cancelling, noise removal and automatic gain by default. That helps on
+      calls and hides real faults. Switch to raw input to hear the microphone itself, including the
+      hum, hiss or crackle that processing was papering over.</p>
+    </article>
+    <article class="c4">
+      <h2>Distance beats equipment</h2>
+      <p>Moving twice as far from a microphone costs you roughly 6 dB of signal while the room noise
+      stays where it was. A cheap microphone a hand's width away will out-perform an expensive one
+      across the desk, every time.</p>
+    </article>
+  </div>
+
+
+  <!-- how to use -->
+  <section class="section" id="how-to" aria-labelledby="h-how">
+    <div class="section__head">
+      <h2 id="h-how">How to use the microphone test</h2>
+      <p>Give the page permission once, watch the meter while you talk, then record a sample so you hear what everyone else hears.</p>
+    </div>
+    <ol class="steps grid">
+      <li class="step c4">
+        <h3>Allow the microphone</h3>
+        <p>Press <em>Start microphone</em>. Your browser asks for permission, and the recording indicator in the tab or address bar confirms it is live.</p>
+        <p>If you have more than one input, pick the right one from the device list. The list only fills in with real names after permission is granted.</p>
+      </li>
+      <li class="step c4">
+        <h3>Talk and watch the level</h3>
+        <p>Speak normally at your usual distance. The waveform should move clearly and the peak reading should land somewhere around -12 dBFS to -6 dBFS.</p>
+        <p>Flat line means nothing is arriving. A meter pinned at 0 dB means you are clipping, which is the distortion people hear as crackling on calls.</p>
+      </li>
+      <li class="step c4">
+        <h3>Record and listen back</h3>
+        <p>Stop talking for a moment to let the noise floor settle, then record a few seconds and play it back. This is the only reliable way to judge hiss, echo and room noise.</p>
+        <p>If the playback sounds distant or hollow, move closer, or check you are not recording from a laptop mic while wearing a headset.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- faq -->
+  <section class="section" id="faq" aria-labelledby="h-faq">
+    <div class="section__head">
+      <h2 id="h-faq">Questions people ask</h2>
+      <p>What the numbers mean, and what to try when the meter stays flat.</p>
+    </div>
+    <div class="faq">
+    <details open>
+      <summary>Why does the page ask for permission?</summary>
+      <div class="faq__a">
+        <p>Browsers will not open a microphone without an explicit prompt, and that prompt is the only way this page can read audio at all. Permission applies to this tab only and ends when you close it or press stop.</p>
+        <p>If you dismissed the prompt by accident, click the padlock or camera icon in the address bar and reset the microphone permission for this site, then reload.</p>
+      </div>
+    </details>
+    <details>
+      <summary>My microphone shows a flat line. What now?</summary>
+      <div class="faq__a">
+        <p>Work through these in order:</p>
+        <p><ul><li>Check the right device is selected in the list, not a disconnected headset or a virtual cable.</li><li>Check the physical mute switch on your headset, and the mute key on your keyboard.</li><li>On Windows, open Settings, Privacy and security, Microphone, and confirm your browser is allowed.</li><li>On macOS, open System Settings, Privacy and Security, Microphone, and do the same.</li><li>Close Zoom, Teams, Discord and OBS, which can hold the device exclusively.</li></ul></p>
+      </div>
+    </details>
+    <details>
+      <summary>What microphone level should I aim for?</summary>
+      <div class="faq__a">
+        <p>Speaking normally, peaks around -12 dBFS to -6 dBFS give you clear speech with room left for a laugh or a raised voice. Average level sitting near -18 dBFS is healthy.</p>
+        <p>If peaks hit 0 dB the signal is clipping and permanently distorted, so turn the input gain down. If you cannot get above about -30 dBFS, turn gain up or move closer.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What is a noise floor and what is a good one?</summary>
+      <div class="faq__a">
+        <p>The noise floor is the level of your room and equipment when nobody is speaking: fans, traffic, air conditioning, and hiss from the microphone itself.</p>
+        <p>Below about -60 dBFS is quiet enough that nobody will notice. Around -50 dBFS is audible on a call. Above -40 dBFS people will hear your room before they hear you, and no amount of software noise removal fixes that cleanly.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can I test a USB, headset or Bluetooth microphone?</summary>
+      <div class="faq__a">
+        <p>Yes. Anything your operating system lists as an input appears in the device list, including USB condenser mics, headset booms, webcam mics, audio interfaces and Bluetooth earbuds.</p>
+        <p>Choose the device before you start, or switch it mid-test and the page will restart the stream on the new input.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why does my Bluetooth headset sound terrible when the mic is on?</summary>
+      <div class="faq__a">
+        <p>Most Bluetooth headsets cannot send and receive high quality audio at the same time. The moment the microphone opens, the connection drops to a narrow voice profile, music quality collapses and everything sounds thin and muffled.</p>
+        <p>That is a limitation of the Bluetooth profile rather than a fault. A USB or wired headset avoids it entirely, which is why it is the usual recommendation for calls and recording.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why does my voice sound quiet even at full volume?</summary>
+      <div class="faq__a">
+        <p>Automatic gain control is the usual cause. Browsers apply it by default to keep call levels even, and it fights any gain you set yourself.</p>
+        <p>Distance is the other cause, and it matters more than people expect: doubling your distance from the mic cuts the level by roughly 6 dB. A microphone a hand's width from your mouth will always beat one across the desk.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Is my recording uploaded anywhere?</summary>
+      <div class="faq__a">
+        <p>No. The waveform, the meters and the recording all stay in your browser's memory. Nothing is written to a server, nothing is stored on disk unless you save it yourself, and reloading the page discards it.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Which browsers can test a microphone?</summary>
+      <div class="faq__a">
+        <p>Chrome, Edge, Firefox, Safari and Opera all support microphone access on desktop, and Chrome and Safari support it on Android and iOS.</p>
+        <p>Access requires a secure connection, so a page served over plain HTTP cannot open your microphone at all. That is a browser rule rather than a site setting.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Does this test whether other people can hear me?</summary>
+      <div class="faq__a">
+        <p>It tests everything up to the moment your voice leaves the browser: the device, the driver, the level and the sound quality. If the waveform moves and the playback sounds right, your microphone is working.</p>
+        <p>If it works here but not in a specific app, the fault is that app's device selection or permissions rather than your hardware, which is a much quicker thing to fix.</p>
+      </div>
+    </details>
+    </div>
+  </section>
+
+  <!-- other tools -->
+  <section class="section" id="more" aria-labelledby="h-more">
+    <div class="section__head">
+      <h2 id="h-more">Test the rest of your setup</h2>
+      <p>Every tool runs in this tab, reads your hardware directly through the browser, and stores nothing.</p>
+    </div>
+    <div class="tools">
+    <a class="tool" href="/">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><b>Gamepad</b></span>
+      <p>Check buttons, analog sticks, triggers, the D-pad and rumble, and measure stick drift.</p>
+    </a>
+    <a class="tool" href="/speaker-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><b>Speakers</b></span>
+      <p>Left and right channel checks, a tone generator, and a 20 Hz to 20 kHz hearing sweep.</p>
+    </a>
+    <a class="tool" href="/keyboard-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><b>Keyboard</b></span>
+      <p>Light up a full layout key by key, read live key codes, and test N-key rollover.</p>
+    </a>
+    <a class="tool" href="/mouse-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><b>Mouse</b></span>
+      <p>Buttons, scroll wheel, movement trace, polling rate in Hz, and a double-click chatter check.</p>
+    </a>
+    <a class="tool" href="/webcam-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-camera"></use></svg><b>Webcam</b></span>
+      <p>Live preview, real resolution and measured frame rate, camera switching and snapshots.</p>
+    </a>
+    <a class="tool" href="/screen-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-display"></use></svg><b>Screen</b></span>
+      <p>Dead pixel hunt, backlight bleed check, gradient banding, and a measured refresh rate.</p>
+    </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav class="foot-links" aria-label="All tests">
+      <a href="/">Gamepad test</a>
+      <a href="/">Gamepad</a>
+      <a href="/speaker-test">Speakers</a>
+      <a href="/keyboard-test">Keyboard</a>
+      <a href="/mouse-test">Mouse</a>
+      <a href="/webcam-test">Webcam</a>
+      <a href="/screen-test">Screen</a>
+    </nav>
+    <div class="grid">
+      <p class="sig c6"><b>Melted Code</b> — browser hardware diagnostics</p>
+      <p class="foot-note c6">Runs entirely on your device. Nothing you press, say or show is recorded or uploaded.</p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  "use strict";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var statusEl = $("status"), statusText = $("statusText"), prompt = $("prompt");
+  var wave = $("wave"), spec = $("spec");
+  var wctx = wave.getContext("2d"), sctx = spec.getContext("2d");
+
+  var css = getComputedStyle(document.documentElement);
+  var COL = {
+    signal: css.getPropertyValue("--signal").trim() || "#ff7a18",
+    analog: css.getPropertyValue("--analog").trim() || "#3ed0c4",
+    rule:   css.getPropertyValue("--rule").trim()   || "#333b43",
+    dim:    css.getPropertyValue("--dim").trim()    || "#606a74",
+    alert:  css.getPropertyValue("--alert").trim()  || "#ff5252"
+  };
+
+  var stream = null, actx = null, analyser = null, source = null, raf = null;
+  var timeBuf = null, freqBuf = null;
+  var peakHold = -Infinity, clips = 0, floor = Infinity, floorSeen = false;
+  var startedAt = 0, frames = 0, fpsMark = 0;
+  var recorder = null, chunks = [], blobUrl = null, recTimer = null;
+
+  /* ── helpers ───────────────────────────────────────────────────────── */
+  function dbfs(amp){ return amp <= 0.0000001 ? -100 : Math.max(-100, 20 * Math.log10(amp)); }
+  function pct(db){ return Math.max(0, Math.min(100, (db + 60) / 60 * 100)); }
+  function show(db){ return db <= -99 ? "—" : (db > -1 ? db.toFixed(1) : db.toFixed(1)) + " dB"; }
+
+  function fitCanvas(cv, ctx){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !h) return;
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)){
+      cv.width = Math.round(w * dpr);
+      cv.height = Math.round(h * dpr);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: w, h: h };
+  }
+
+  /* keep the canvases at a sensible aspect before any stream exists */
+  function sizeBoxes(){
+    wave.style.height = Math.round(Math.min(260, Math.max(150, wave.clientWidth * 0.29))) + "px";
+    spec.style.height = Math.round(Math.min(160, Math.max(96, spec.clientWidth * 0.17))) + "px";
+  }
+  sizeBoxes();
+  window.addEventListener("resize", sizeBoxes);
+
+  function idle(){
+    var b = fitCanvas(wave, wctx); if (!b) return;
+    wctx.clearRect(0, 0, b.w, b.h);
+    wctx.strokeStyle = COL.rule;
+    wctx.lineWidth = 1;
+    wctx.beginPath();
+    wctx.moveTo(0, b.h / 2 + .5);
+    wctx.lineTo(b.w, b.h / 2 + .5);
+    wctx.stroke();
+    var s = fitCanvas(spec, sctx);
+    sctx.clearRect(0, 0, s.w, s.h);
+  }
+  idle();
+  window.addEventListener("resize", idle);
+
+  /* ── devices ───────────────────────────────────────────────────────── */
+  var devSel = $("devices");
+
+  function listDevices(){
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+    navigator.mediaDevices.enumerateDevices().then(function(all){
+      var ins = all.filter(function(d){ return d.kind === "audioinput"; });
+      if (!ins.length) return;
+      var keep = devSel.value;
+      devSel.innerHTML = "";
+      ins.forEach(function(d, i){
+        var o = document.createElement("option");
+        o.value = d.deviceId;
+        o.textContent = d.label || ("Microphone " + (i + 1));
+        devSel.appendChild(o);
+      });
+      if (keep) devSel.value = keep;
+      devSel.disabled = false;
+      $("devNote").textContent = ins.length + (ins.length === 1 ? " input" : " inputs");
+    }).catch(function(){});
+  }
+
+  if (navigator.mediaDevices && navigator.mediaDevices.addEventListener){
+    navigator.mediaDevices.addEventListener("devicechange", listDevices);
+  }
+
+  /* ── start / stop ──────────────────────────────────────────────────── */
+  function start(){
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      fail("This browser cannot open a microphone. Try Chrome, Edge, Firefox or Safari.");
+      return;
+    }
+    var off = $("raw").checked;
+    var audio = {
+      echoCancellation: !off,
+      noiseSuppression: !off,
+      autoGainControl: !off
+    };
+    if (devSel.value && !devSel.disabled) audio.deviceId = { exact: devSel.value };
+
+    $("start").disabled = true;
+    statusText.textContent = "Waiting for permission";
+
+    navigator.mediaDevices.getUserMedia({ audio: audio, video: false })
+      .then(open)
+      .catch(function(err){
+        $("start").disabled = false;
+        if (err && (err.name === "NotAllowedError" || err.name === "SecurityError")){
+          fail("Permission was refused. Open the padlock in the address bar and allow the microphone, then reload.");
+        } else if (err && err.name === "NotFoundError"){
+          fail("No microphone was found. Check it is plugged in and enabled in your system settings.");
+        } else if (err && err.name === "NotReadableError"){
+          fail("Another application is holding the microphone. Close Zoom, Teams, Discord or OBS and try again.");
+        } else {
+          fail("The microphone could not be opened.");
+        }
+      });
+  }
+
+  function fail(msg){
+    statusEl.classList.remove("is-live");
+    statusEl.classList.add("is-warn");
+    statusText.textContent = "Microphone unavailable";
+    prompt.hidden = false;
+    prompt.querySelector("h2").textContent = "Could not start";
+    prompt.querySelector("p").textContent = msg;
+  }
+
+  function open(s){
+    stream = s;
+    var track = s.getAudioTracks()[0];
+    var set = track.getSettings ? track.getSettings() : {};
+
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === "suspended") actx.resume();
+    source = actx.createMediaStreamSource(s);
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.72;
+    analyser.minDecibels = -95;
+    analyser.maxDecibels = -6;
+    source.connect(analyser);
+
+    timeBuf = new Float32Array(analyser.fftSize);
+    freqBuf = new Uint8Array(analyser.frequencyBinCount);
+
+    $("dRate").textContent = (actx.sampleRate / 1000).toFixed(1) + " kHz";
+    $("dCh").textContent = set.channelCount || source.channelCount || 1;
+    $("dEcho").textContent = set.echoCancellation === undefined ? "unknown" : (set.echoCancellation ? "on" : "off");
+    $("dNs").textContent = set.noiseSuppression === undefined ? "unknown" : (set.noiseSuppression ? "on" : "off");
+    $("dAgc").textContent = set.autoGainControl === undefined ? "unknown" : (set.autoGainControl ? "on" : "off");
+
+    statusEl.classList.remove("is-warn");
+    statusEl.classList.add("is-live");
+    statusText.textContent = "Microphone live";
+    prompt.hidden = true;
+    $("start").disabled = true;
+    $("stop").disabled = false;
+    $("rec").disabled = false;
+
+    resetMeasurements();
+    startedAt = performance.now();
+    fpsMark = startedAt;
+    listDevices();
+
+    track.addEventListener("ended", stop);
+    if (!raf) raf = requestAnimationFrame(loop);
+  }
+
+  function stop(){
+    if (recorder && recorder.state === "recording") recorder.stop();
+    if (raf){ cancelAnimationFrame(raf); raf = null; }
+    if (stream){ stream.getTracks().forEach(function(t){ t.stop(); }); stream = null; }
+    if (actx){ actx.close().catch(function(){}); actx = null; }
+    analyser = source = null;
+
+    statusEl.classList.remove("is-live", "is-warn");
+    statusText.textContent = "Microphone off";
+    prompt.hidden = false;
+    prompt.querySelector("h2").textContent = "Your microphone is off";
+    prompt.querySelector("p").textContent = "Nothing is captured until you start it, and nothing is ever sent anywhere.";
+    $("start").disabled = false;
+    $("stop").disabled = true;
+    $("rec").disabled = true;
+    ["dRate","dCh","dEcho","dNs","dAgc","dSnr","dElapsed"].forEach(function(id){ $(id).textContent = "—"; });
+    $("fps").textContent = "— fps";
+    $("peakFill").style.width = $("rmsFill").style.width = "0%";
+    $("peakVal").textContent = $("rmsVal").textContent = "—";
+    idle();
+  }
+
+  function resetMeasurements(){
+    peakHold = -Infinity; clips = 0; floor = Infinity; floorSeen = false;
+    $("peakHold").textContent = "—";
+    $("clips").textContent = "0";
+    $("floorVal").textContent = "—";
+    $("levelNote").className = "note";
+    $("floorNote").className = "note";
+    $("levelMsg").textContent = "Speak normally. Peaks between -12 and -6 dBFS are the target.";
+    $("floorMsg").textContent = "Stay quiet for a few seconds and the floor settles. Below -60 dBFS nobody will hear your room.";
+  }
+
+  $("start").addEventListener("click", start);
+  $("startTop").addEventListener("click", start);
+  $("stop").addEventListener("click", stop);
+  $("reNoise").addEventListener("click", function(){
+    floor = Infinity; floorSeen = false;
+    $("floorVal").textContent = "—";
+    $("floorNote").className = "note";
+  });
+  devSel.addEventListener("change", function(){ if (stream){ stop(); start(); } });
+  $("raw").addEventListener("change", function(){ if (stream){ stop(); start(); } });
+
+  /* ── recorder ──────────────────────────────────────────────────────── */
+  var recBtn = $("rec"), player = $("player");
+
+  recBtn.addEventListener("click", function(){
+    if (!stream) return;
+    if (recorder && recorder.state === "recording"){ recorder.stop(); return; }
+    if (!window.MediaRecorder){
+      $("recNote").textContent = "not supported here";
+      return;
+    }
+    chunks = [];
+    try {
+      recorder = new MediaRecorder(stream);
+    } catch (e){
+      $("recNote").textContent = "not supported here";
+      return;
+    }
+    recorder.ondataavailable = function(e){ if (e.data && e.data.size) chunks.push(e.data); };
+    recorder.onstop = function(){
+      clearTimeout(recTimer);
+      recBtn.textContent = "Record";
+      recBtn.classList.remove("btn--rec");
+      $("recNote").textContent = "ready to play";
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+      var blob = new Blob(chunks, { type: chunks.length && chunks[0].type ? chunks[0].type : "audio/webm" });
+      blobUrl = URL.createObjectURL(blob);
+      player.src = blobUrl;
+      player.hidden = false;
+      $("dl").disabled = false;
+    };
+    recorder.start();
+    recBtn.textContent = "Stop recording";
+    recBtn.classList.add("btn--rec");
+    $("recNote").textContent = "recording";
+    recTimer = setTimeout(function(){
+      if (recorder && recorder.state === "recording") recorder.stop();
+    }, 15000);
+  });
+
+  $("dl").addEventListener("click", function(){
+    if (!blobUrl) return;
+    var a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = "microphone-test.webm";
+    a.click();
+  });
+
+  /* ── draw loop ─────────────────────────────────────────────────────── */
+  function loop(now){
+    raf = requestAnimationFrame(loop);
+    if (!analyser) return;
+
+    frames++;
+    if (now - fpsMark >= 500){
+      $("fps").textContent = Math.round(frames * 1000 / (now - fpsMark)) + " fps";
+      frames = 0; fpsMark = now;
+    }
+
+    /* ── read ── */
+    if (analyser.getFloatTimeDomainData) analyser.getFloatTimeDomainData(timeBuf);
+    analyser.getByteFrequencyData(freqBuf);
+
+    var i, v, sum = 0, peak = 0, clipped = false;
+    for (i = 0; i < timeBuf.length; i++){
+      v = timeBuf[i];
+      sum += v * v;
+      var a = v < 0 ? -v : v;
+      if (a > peak) peak = a;
+      if (a >= 0.99) clipped = true;
+    }
+    var rms = Math.sqrt(sum / timeBuf.length);
+    var peakDb = dbfs(peak), rmsDb = dbfs(rms);
+
+    if (clipped){ clips++; $("clips").textContent = clips; }
+    if (peakDb > peakHold){
+      peakHold = peakDb;
+      $("peakHold").textContent = show(peakHold);
+    }
+
+    /* noise floor: drop instantly, rise very slowly */
+    if (rmsDb < floor){ floor = rmsDb; floorSeen = true; }
+    else floor += (rmsDb - floor) * 0.00008;
+
+    /* ── meters ── */
+    $("peakFill").style.width = pct(peakDb).toFixed(1) + "%";
+    $("rmsFill").style.width = pct(rmsDb).toFixed(1) + "%";
+    $("peakVal").textContent = show(peakDb);
+    $("rmsVal").textContent = show(rmsDb);
+
+    if (floorSeen && floor > -100){
+      $("floorVal").textContent = floor.toFixed(0);
+      var fn = $("floorNote");
+      if (floor > -40){
+        fn.className = "note warn";
+        $("floorMsg").textContent = "That is a loud room. People will hear your background before they hear you, and noise removal will not hide it cleanly.";
+      } else if (floor > -55){
+        fn.className = "note";
+        $("floorMsg").textContent = "Audible background noise. Fine for a meeting, not ideal for recording.";
+      } else {
+        fn.className = "note ok";
+        $("floorMsg").textContent = "Quiet enough that nobody will notice your room.";
+      }
+      if (peakHold > -100) $("dSnr").textContent = Math.max(0, peakHold - floor).toFixed(0) + " dB";
+    }
+
+    /* ── verdict ── */
+    var ln = $("levelNote");
+    if (clips > 3){
+      ln.className = "note warn";
+      $("levelMsg").textContent = "Your input is clipping. Turn the microphone gain down, or move back a little, or the distortion is permanent.";
+    } else if (peakHold > -3){
+      ln.className = "note warn";
+      $("levelMsg").textContent = "Peaks are almost at the ceiling. Drop the gain a few notches.";
+    } else if (peakHold > -18 && peakHold < -3){
+      ln.className = "note ok";
+      $("levelMsg").textContent = "Good level. There is room for a raised voice without distorting.";
+    } else if (peakHold > -100 && peakHold < -30){
+      ln.className = "note";
+      $("levelMsg").textContent = "Very quiet. Raise the gain in your system sound settings, or move closer to the microphone.";
+    }
+
+    var secs = (now - startedAt) / 1000;
+    $("dElapsed").textContent = secs < 60 ? secs.toFixed(0) + " s" : (secs / 60).toFixed(1) + " min";
+
+    /* ── waveform ── */
+    var b = fitCanvas(wave, wctx);
+    if (b){
+      wctx.clearRect(0, 0, b.w, b.h);
+      wctx.strokeStyle = COL.rule;
+      wctx.lineWidth = 1;
+      wctx.beginPath();
+      wctx.moveTo(0, b.h / 2 + .5); wctx.lineTo(b.w, b.h / 2 + .5);
+      wctx.stroke();
+
+      wctx.beginPath();
+      wctx.strokeStyle = clipped ? COL.alert : (rms > 0.004 ? COL.analog : COL.dim);
+      wctx.lineWidth = 1.8;
+      wctx.lineJoin = "round";
+      var step = timeBuf.length / b.w;
+      for (i = 0; i < b.w; i++){
+        var s = timeBuf[Math.floor(i * step)] || 0;
+        var y = b.h / 2 - s * (b.h / 2 - 6);
+        if (i === 0) wctx.moveTo(i, y); else wctx.lineTo(i, y);
+      }
+      wctx.stroke();
+    }
+
+    /* ── spectrum ── */
+    var sb = fitCanvas(spec, sctx);
+    if (sb){
+      sctx.clearRect(0, 0, sb.w, sb.h);
+      var bars = Math.min(72, Math.floor(sb.w / 6));
+      var bw = sb.w / bars;
+      for (i = 0; i < bars; i++){
+        /* logarithmic bin spread so speech is not crushed into the left edge */
+        var t0 = Math.pow(i / bars, 2.1), t1 = Math.pow((i + 1) / bars, 2.1);
+        var b0 = Math.floor(t0 * freqBuf.length), b1 = Math.max(b0 + 1, Math.floor(t1 * freqBuf.length));
+        var m = 0;
+        for (var j = b0; j < b1 && j < freqBuf.length; j++) if (freqBuf[j] > m) m = freqBuf[j];
+        var h = (m / 255) * (sb.h - 4);
+        sctx.fillStyle = m > 215 ? COL.signal : COL.analog;
+        sctx.globalAlpha = 0.25 + (m / 255) * 0.75;
+        sctx.fillRect(i * bw + 1, sb.h - h, bw - 2, h);
+      }
+      sctx.globalAlpha = 1;
+    }
+  }
+
+  window.addEventListener("pagehide", stop);
+})();
+
+</script>
+</body>
+</html>

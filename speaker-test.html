@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Speaker &amp; Headphone Test — Left Right Channel, Tone and Frequency Sweep</title>
+<meta name="description" content="Free online speaker test. Check left and right channels, play a tone at any frequency, run a 20 Hz to 20 kHz sweep to find your hearing range, and check balance. Works with speakers, headphones and earbuds.">
+<link rel="canonical" href="https://gamepad-tester.vercel.app/speaker-test">
+<meta name="theme-color" content="#14181C">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hardware Test Bench">
+<meta property="og:title" content="Speaker &amp; Headphone Test — Left Right Channel, Tone and Frequency Sweep">
+<meta property="og:description" content="Free online speaker test. Check left and right channels, play a tone at any frequency, run a 20 Hz to 20 kHz sweep to find your hearing range, and check balance. Works with speakers, headphones and earbuds.">
+<meta property="og:url" content="https://gamepad-tester.vercel.app/speaker-test">
+<meta property="og:image" content="https://gamepad-tester.vercel.app/og.png">
+<meta property="og:image:alt" content="A dark instrument panel lighting up as hardware is tested.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Speaker &amp; Headphone Test — Left Right Channel, Tone and Frequency Sweep">
+<meta name="twitter:description" content="Free online speaker test. Check left and right channels, play a tone at any frequency, run a 20 Hz to 20 kHz sweep to find your hearing range, and check balance. Works with speakers, headphones and earbuds.">
+<meta name="twitter:image" content="https://gamepad-tester.vercel.app/og.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap"></noscript>
+<link rel="stylesheet" href="/assets/base.css">
+<style>
+.stereo{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);
+  margin-bottom:18px;
+}
+.cone{
+  display:grid;justify-items:center;gap:8px;
+  padding:18px 10px 14px;
+  background:var(--panel-hi);
+  border:1px solid var(--rule-soft);
+  border-radius:var(--r-chip);
+}
+.cone svg{width:100%;max-width:150px;height:auto}
+.cone--r svg{transform:scaleX(-1)}
+.cone b{font-size:13px;font-weight:500;color:var(--muted)}
+.cone__body{fill:var(--recess);stroke:#6f777f;stroke-width:1.4;stroke-linejoin:round}
+.cone__w{
+  fill:none;stroke:var(--rule);stroke-width:3.4;stroke-linecap:round;
+  transition:stroke .12s;
+}
+.cone.on{border-color:rgba(255,122,24,.45)}
+.cone.on b{color:var(--text)}
+.cone.on .cone__body{fill:var(--signal);stroke:var(--signal)}
+.cone.on .cone__w{stroke:var(--signal)}
+.cone.on .cone__w1{animation:ring .6s ease-out infinite}
+.cone.on .cone__w2{animation:ring .6s ease-out .12s infinite}
+.cone.on .cone__w3{animation:ring .6s ease-out .24s infinite}
+@keyframes ring{0%{opacity:.25}45%{opacity:1}100%{opacity:.25}}
+
+.chanrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:520px){ .chanrow{grid-template-columns:1fr} .stereo{gap:10px} }
+
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.presets .btn{padding:8px 4px;font-size:12.5px}
+@media (max-width:640px){ .presets{grid-template-columns:repeat(2,1fr)} }
+
+.wavepick{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.wavepick .btn{padding:8px 4px;font-size:12.5px}
+@media (max-width:640px){ .wavepick{grid-template-columns:repeat(3,1fr)} }
+
+.freqbig{
+  display:flex;align-items:baseline;gap:8px;
+  margin-bottom:12px;
+}
+.freqbig strong{
+  font-family:var(--display);font-size:46px;font-weight:600;
+  font-variation-settings:"wdth" 86;letter-spacing:-.035em;line-height:1;
+}
+.freqbig span{font-size:14px;color:var(--muted)}
+
+.sweepbar{
+  height:8px;background:var(--panel-hi);
+  border:1px solid var(--rule);border-radius:100px;overflow:hidden;
+}
+.sweepbar i{
+  display:block;height:100%;width:0;
+  background:linear-gradient(90deg,var(--analog),var(--signal));
+}
+
+.stage__note{
+  font-size:12.5px;color:var(--muted);text-align:center;
+  padding:12px 4px 2px;border-top:1px solid var(--rule-soft);margin-top:16px;
+}
+.note__msg{font-size:13px;color:var(--muted);line-height:1.5}
+.note.ok .note__msg{color:#a8e8e0}
+.note[hidden]{display:none}
+
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://gamepad-tester.vercel.app/#website",
+      "url": "https://gamepad-tester.vercel.app/",
+      "name": "Hardware Test Bench",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://gamepad-tester.vercel.app/speaker-test#app",
+      "name": "Speaker and Headphone Test",
+      "url": "https://gamepad-tester.vercel.app/speaker-test",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Windows, macOS, Linux, Android, iOS, ChromeOS",
+      "browserRequirements": "Modern browser, no plugins or downloads",
+      "description": "Browser tool that generates test tones, checks left and right channels and sweeps the audible frequency range to test speakers, headphones and earbuds.",
+      "isPartOf": {
+        "@id": "https://gamepad-tester.vercel.app/#website"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://gamepad-tester.vercel.app/speaker-test#crumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://gamepad-tester.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Speakers",
+          "item": "https://gamepad-tester.vercel.app/speaker-test"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://gamepad-tester.vercel.app/speaker-test#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I test left and right speakers?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use the channel buttons. Each one plays a short burst on one side only, so you can confirm which speaker is which and that both are alive. The most common finding is a stereo pair wired the wrong way round, which is invisible until you test it and quietly ruins every film and game you have played on that setup."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why can I only hear one side?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Check in this order: the balance control in your operating system sound settings, the cable seated fully at both ends, a different port or device, and a different pair of headphones in the same port. If one side is dead on every device, the output is at fault. If it follows the headphones to another device, the headphones are at fault. That single swap tells you which thing to replace."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the frequency sweep for?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It plays a continuous tone that climbs from a deep bass note to the top of the audible range, so you hear your whole system in one pass. It shows two separate things: where your hearing stops, and where your speakers stop. A rattle at a particular frequency is a loose driver or cabinet. A clean fade out at the top is normal for both ears and equipment."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why can't I hear the highest frequencies?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Almost certainly age, and it is completely normal. Human hearing is often quoted as 20 Hz to 20 kHz, but that upper figure describes healthy young ears. Most people in their thirties top out around 15 to 16 kHz and it keeps falling. Small speakers and phone speakers also roll off early, so if you cannot hear 60 Hz on a laptop that is the laptop rather than your ears."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it safe to play test tones through my speakers?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "At sensible volume, yes. The risk is at high volume: a sustained sine wave puts far more continuous energy into a driver than music does, and tweeters are the first thing to fail. Keep the level moderate, keep sustained tones short, and never start a sweep with headphones already on your ears."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I test headphones, earbuds and Bluetooth devices?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, all of them. The test plays through whatever your system currently uses for output, so select your headphones as the default device first. Bluetooth adds noticeable delay between pressing a button and hearing the tone. That lag is the wireless link, not a fault, and it does not affect the channel or frequency results."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I choose which output device the test uses?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Where the browser allows it, yes, and an output picker appears. Chrome and Edge support choosing an output device from a web page; Firefox and Safari generally do not. When no picker is available, change your default output in system sound settings and the test follows it."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What causes crackling or popping during the test?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Crackling that appears at every frequency usually means a buffer problem on the computer rather than the speaker: a busy CPU, an aggressive power saving setting, or a driver that needs updating. Crackling that only appears around certain frequencies, or that you can make worse by touching the cable, is physical. A damaged cable, a loose connector or a torn driver all sound like that."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is there a delay before I hear anything?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Browsers suspend audio until you interact with the page, so the first press both starts the audio engine and plays the sound. Later presses respond immediately. Bluetooth output adds its own delay on top, typically between 100 and 300 milliseconds depending on the codec."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this test speaker quality or just whether they work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It tests function rather than fidelity: which channel is which, whether both work, whether anything rattles, and how far the system reaches at each end of the range. Judging tonal quality needs a measurement microphone and a treated room. What this page reliably catches is the faults that matter: a dead side, a swapped pair, a buzzing driver, or a device that quietly collapsed to mono."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "@id": "https://gamepad-tester.vercel.app/speaker-test#howto",
+      "name": "How to use the speaker and headphone test",
+      "totalTime": "PT2M",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Turn the volume down first",
+          "text": "Set your system volume low before you play anything, then raise it into the test. Pure tones sound much louder than music at the same level and there is no warning. Take headphones off your ears for the first press. If something is wrong with the balance or the output device, you find out safely.",
+          "url": "https://gamepad-tester.vercel.app/speaker-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Check left, then right",
+          "text": "Play the left channel on its own and confirm sound comes only from the left. Repeat on the right, then play both and listen for a centred, even image. Sound from the wrong side means a swapped cable or a reversed connector. Sound from both when only one is playing means your output is summing to mono.",
+          "url": "https://gamepad-tester.vercel.app/speaker-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Sweep the range",
+          "text": "Run the sweep and note where you stop hearing the tone at each end. Most adults stop somewhere between 14 kHz and 17 kHz, and that upper limit falls with age. Buzzing, rattling or a sudden drop partway through points at the speaker rather than your ears. Note the frequency and try the same sweep on headphones to confirm.",
+          "url": "https://gamepad-tester.vercel.app/speaker-test#how-to"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C9C7L3L68W"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-C9C7L3L68W');
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8a4 4 0 0 1 3.9 3.1l1 4.4c.4 1.9-2 2.9-3 1.3l-1.6-2.5a1.5 1.5 0 0 0-1.3-.7H8.9a1.5 1.5 0 0 0-1.3.7l-1.5 2.5c-1 1.6-3.4.6-3-1.3l1-4.4A4 4 0 0 1 8 9z"/><path d="M8.2 11.5v2.2M7.1 12.6h2.2"/><circle cx="15.8" cy="12.6" r=".95" fill="currentColor" stroke="none"/></symbol><symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9.5" y="2.8" width="5" height="10.4" rx="2.5"/><path d="M5.6 11.2a6.4 6.4 0 0 0 12.8 0"/><path d="M12 17.6v3.6"/></symbol><symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 9.4h3l4.4-3.7a.8.8 0 0 1 1.3.6v11.4a.8.8 0 0 1-1.3.6l-4.4-3.7h-3a.9.9 0 0 1-.9-.9v-3.4a.9.9 0 0 1 .9-.9z"/><path d="M16.6 9.2a4 4 0 0 1 0 5.6M19.2 6.6a7.6 7.6 0 0 1 0 10.8"/></symbol><symbol id="i-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="6" width="19.2" height="12" rx="2"/><path d="M6 9.6h.01M9.6 9.6h.01M13.2 9.6h.01M16.8 9.6h.01M6 12.9h.01M9.6 12.9h.01M13.2 12.9h.01M16.8 12.9h.01M8.2 15.7h7.6"/></symbol><symbol id="i-mouse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6.4" y="2.5" width="11.2" height="19" rx="5.6"/><path d="M12 6.4v3.8"/></symbol><symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.6 8.6h3.2l1.5-2.6h9.4l1.5 2.6h3.2a.9.9 0 0 1 .9.9v8a.9.9 0 0 1-.9.9H2.6a.9.9 0 0 1-.9-.9v-8a.9.9 0 0 1 .9-.9z"/><circle cx="12" cy="13.4" r="3.4"/></symbol><symbol id="i-display" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="4" width="19.2" height="13" rx="2"/><path d="M9 21.2h6M12 17.2v4"/></symbol></defs></svg>
+
+<header class="masthead">
+  <div class="wrap grid">
+    <div class="c7">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z" fill="#c9cfd6"/>
+          <circle cx="21.5" cy="16.5" r="1.9" fill="#ff7a18"/>
+          <rect x="8" y="15.4" width="6" height="2.2" rx="1.1" fill="#14181c"/>
+          <rect x="9.9" y="13.5" width="2.2" height="6" rx="1.1" fill="#14181c"/>
+        </svg>
+        <span class="brandname">Hardware Test Bench</span>
+      </a>
+      <h1>Speaker test</h1>
+      <p class="tagline">Check left and right, play a clean tone at any frequency, and sweep the whole audible range to hear where your kit gives up.</p>
+    </div>
+    <div class="c5 status-wrap">
+      <p class="status" id="status" role="status" aria-live="polite">
+        <span class="status__dot" aria-hidden="true"></span>
+        <span id="statusText">Audio idle</span>
+      </p>
+    </div>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Hardware tests">
+  <div class="wrap rail__inner">
+      <a href="/"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><span>Gamepad</span></a>
+      <a href="/microphone-test"><svg aria-hidden="true"><use href="#i-mic"></use></svg><span>Microphone</span></a>
+      <a href="/speaker-test" aria-current="page"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><span>Speakers</span></a>
+      <a href="/keyboard-test"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><span>Keyboard</span></a>
+      <a href="/mouse-test"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><span>Mouse</span></a>
+      <a href="/webcam-test"><svg aria-hidden="true"><use href="#i-camera"></use></svg><span>Webcam</span></a>
+      <a href="/screen-test"><svg aria-hidden="true"><use href="#i-display"></use></svg><span>Screen</span></a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- channels -->
+    <section class="panel c8" aria-labelledby="h-chan">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-chan">Left and right</h2>
+        <span class="panel__note" id="chanNote">turn your volume down first</span>
+      </div>
+
+      <div class="stereo" aria-hidden="true">
+        <div class="cone" id="coneL">
+          <svg viewBox="0 0 120 120">
+            <path class="cone__body" d="M22 46h16l24-19a3 3 0 0 1 5 2.3v61.4a3 3 0 0 1-5 2.3L38 74H22a4 4 0 0 1-4-4V50a4 4 0 0 1 4-4z"/>
+            <path class="cone__w cone__w1" d="M78 46a20 20 0 0 1 0 28"/>
+            <path class="cone__w cone__w2" d="M90 36a34 34 0 0 1 0 48"/>
+            <path class="cone__w cone__w3" d="M102 26a48 48 0 0 1 0 68"/>
+          </svg>
+          <b>Left</b>
+        </div>
+        <div class="cone cone--r" id="coneR">
+          <svg viewBox="0 0 120 120">
+            <path class="cone__body" d="M22 46h16l24-19a3 3 0 0 1 5 2.3v61.4a3 3 0 0 1-5 2.3L38 74H22a4 4 0 0 1-4-4V50a4 4 0 0 1 4-4z"/>
+            <path class="cone__w cone__w1" d="M78 46a20 20 0 0 1 0 28"/>
+            <path class="cone__w cone__w2" d="M90 36a34 34 0 0 1 0 48"/>
+            <path class="cone__w cone__w3" d="M102 26a48 48 0 0 1 0 68"/>
+          </svg>
+          <b>Right</b>
+        </div>
+      </div>
+
+      <div class="chanrow">
+        <button class="btn" id="playL">Play left only</button>
+        <button class="btn" id="playBoth">Play both</button>
+        <button class="btn" id="playR">Play right only</button>
+      </div>
+
+      <p class="stage__note" id="verdict">Each button plays a short burst. Confirm the sound arrives
+      from the side you pressed, and only that side.</p>
+    </section>
+
+    <!-- output -->
+    <section class="panel c4" aria-labelledby="h-out">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-out">Output</h2>
+        <span class="panel__note" id="outNote">system default</span>
+      </div>
+
+      <div class="ctrl" id="sinkWrap" hidden>
+        <label for="sinks">Play through</label>
+        <select id="sinks"></select>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl__row"><label for="vol">Volume</label><output id="volOut">20%</output></div>
+        <input type="range" id="vol" min="0" max="80" step="1" value="20">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl__row"><label for="bal">Balance</label><output id="balOut">centre</output></div>
+        <input type="range" id="bal" min="-1" max="1" step="0.05" value="0">
+      </div>
+
+      <dl class="spec">
+        <div><dt>Sample rate</dt><dd id="dRate">—</dd></div>
+        <div><dt>Output channels</dt><dd id="dCh">—</dd></div>
+        <div><dt>Latency</dt><dd id="dLat">—</dd></div>
+      </dl>
+
+      <button class="btn btn--wide" id="stopAll" style="margin-top:16px">Stop all sound</button>
+    </section>
+
+    <!-- tone -->
+    <section class="panel c8" aria-labelledby="h-tone">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-tone">Tone generator</h2>
+        <span class="panel__note" id="toneNote">idle</span>
+      </div>
+
+      <p class="freqbig"><strong id="freqVal">440</strong><span>Hz</span></p>
+
+      <div class="ctrl">
+        <div class="ctrl__row"><label for="freq">Frequency</label><output id="freqOut">440 Hz — A above middle C</output></div>
+        <input type="range" id="freq" min="0" max="1000" step="1" value="447">
+      </div>
+
+      <div class="presets">
+        <button class="btn" data-hz="60">60 Hz</button>
+        <button class="btn" data-hz="120">120 Hz</button>
+        <button class="btn" data-hz="440">440 Hz</button>
+        <button class="btn" data-hz="1000">1 kHz</button>
+        <button class="btn" data-hz="5000">5 kHz</button>
+        <button class="btn" data-hz="10000">10 kHz</button>
+        <button class="btn" data-hz="15000">15 kHz</button>
+        <button class="btn" data-hz="18000">18 kHz</button>
+      </div>
+
+      <div class="wavepick" role="group" aria-label="Waveform">
+        <button class="btn on" data-wave="sine">Sine</button>
+        <button class="btn" data-wave="triangle">Triangle</button>
+        <button class="btn" data-wave="square">Square</button>
+        <button class="btn" data-wave="sawtooth">Saw</button>
+        <button class="btn" data-wave="noise">Pink noise</button>
+      </div>
+
+      <div class="btnrow" style="margin-top:18px">
+        <button class="btn btn--go" id="toneGo">Play tone</button>
+        <button class="btn" id="toneStop" disabled>Stop</button>
+      </div>
+    </section>
+
+    <!-- sweep -->
+    <section class="panel c4" aria-labelledby="h-sweep">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-sweep">Hearing sweep</h2>
+        <span class="panel__note">20 Hz – 20 kHz</span>
+      </div>
+
+      <p class="tally"><strong id="sweepHz">—</strong><span>Hz right now</span></p>
+
+      <div class="sweepbar" aria-hidden="true"><i id="sweepFill"></i></div>
+
+      <p class="prose" style="font-size:13.5px;margin:14px 0">
+        Press the button and note the moment the tone disappears at the top. Most adults stop
+        somewhere between 14 and 17 kHz, and it falls with age.
+      </p>
+
+      <div class="ctrl">
+        <div class="ctrl__row"><label for="dur">Sweep time</label><output id="durOut">20 s</output></div>
+        <input type="range" id="dur" min="8" max="45" step="1" value="20">
+      </div>
+
+      <div class="btnrow">
+        <button class="btn btn--go" id="sweepGo">Start sweep</button>
+        <button class="btn" id="sweepMark" disabled>I stopped hearing it</button>
+      </div>
+
+      <p class="note" id="sweepResult" style="margin-top:16px" hidden>
+        <span class="note__msg" id="sweepMsg"></span>
+      </p>
+    </section>
+  </div>
+
+  <div class="info grid">
+    <article class="c4">
+      <h2>Protect your hearing</h2>
+      <p>A sine wave carries far more continuous energy than music at the same meter reading, and it
+      is much easier to misjudge. Start with the volume slider low, raise it slowly, and never begin
+      a sweep with headphones already on your ears.</p>
+    </article>
+    <article class="c4">
+      <h2>What a swapped pair sounds like</h2>
+      <p>Reversed stereo is surprisingly hard to notice and quietly ruins every film, game and
+      recording on that setup. The left and right buttons here are the fastest way to catch it, and
+      the fix is usually one cable swapped at the back.</p>
+    </article>
+    <article class="c4">
+      <h2>Rattles are not your ears</h2>
+      <p>If the sweep produces a buzz or rattle at one particular frequency and then cleans up
+      again, something physical is resonating: a loose driver, a panel, or an object on the shelf.
+      Note the frequency and run the sweep again to confirm.</p>
+    </article>
+  </div>
+
+
+  <!-- how to use -->
+  <section class="section" id="how-to" aria-labelledby="h-how">
+    <div class="section__head">
+      <h2 id="h-how">How to use the speaker test</h2>
+      <p>Start quiet. Test tones carry far more energy than music at the same meter reading, and a sine wave at high volume is unpleasant and can damage tweeters.</p>
+    </div>
+    <ol class="steps grid">
+      <li class="step c4">
+        <h3>Turn the volume down first</h3>
+        <p>Set your system volume low before you play anything, then raise it into the test. Pure tones sound much louder than music at the same level and there is no warning.</p>
+        <p>Take headphones off your ears for the first press. If something is wrong with the balance or the output device, you find out safely.</p>
+      </li>
+      <li class="step c4">
+        <h3>Check left, then right</h3>
+        <p>Play the left channel on its own and confirm sound comes only from the left. Repeat on the right, then play both and listen for a centred, even image.</p>
+        <p>Sound from the wrong side means a swapped cable or a reversed connector. Sound from both when only one is playing means your output is summing to mono.</p>
+      </li>
+      <li class="step c4">
+        <h3>Sweep the range</h3>
+        <p>Run the sweep and note where you stop hearing the tone at each end. Most adults stop somewhere between 14 kHz and 17 kHz, and that upper limit falls with age.</p>
+        <p>Buzzing, rattling or a sudden drop partway through points at the speaker rather than your ears. Note the frequency and try the same sweep on headphones to confirm.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- faq -->
+  <section class="section" id="faq" aria-labelledby="h-faq">
+    <div class="section__head">
+      <h2 id="h-faq">Questions people ask</h2>
+      <p>Channel problems, hearing range, and what the sweep is actually telling you.</p>
+    </div>
+    <div class="faq">
+    <details open>
+      <summary>How do I test left and right speakers?</summary>
+      <div class="faq__a">
+        <p>Use the channel buttons. Each one plays a short burst on one side only, so you can confirm which speaker is which and that both are alive.</p>
+        <p>The most common finding is a stereo pair wired the wrong way round, which is invisible until you test it and quietly ruins every film and game you have played on that setup.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why can I only hear one side?</summary>
+      <div class="faq__a">
+        <p>Check in this order: the balance control in your operating system sound settings, the cable seated fully at both ends, a different port or device, and a different pair of headphones in the same port.</p>
+        <p>If one side is dead on every device, the output is at fault. If it follows the headphones to another device, the headphones are at fault. That single swap tells you which thing to replace.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What is the frequency sweep for?</summary>
+      <div class="faq__a">
+        <p>It plays a continuous tone that climbs from a deep bass note to the top of the audible range, so you hear your whole system in one pass.</p>
+        <p>It shows two separate things: where your hearing stops, and where your speakers stop. A rattle at a particular frequency is a loose driver or cabinet. A clean fade out at the top is normal for both ears and equipment.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why can't I hear the highest frequencies?</summary>
+      <div class="faq__a">
+        <p>Almost certainly age, and it is completely normal. Human hearing is often quoted as 20 Hz to 20 kHz, but that upper figure describes healthy young ears. Most people in their thirties top out around 15 to 16 kHz and it keeps falling.</p>
+        <p>Small speakers and phone speakers also roll off early, so if you cannot hear 60 Hz on a laptop that is the laptop rather than your ears.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Is it safe to play test tones through my speakers?</summary>
+      <div class="faq__a">
+        <p>At sensible volume, yes. The risk is at high volume: a sustained sine wave puts far more continuous energy into a driver than music does, and tweeters are the first thing to fail.</p>
+        <p>Keep the level moderate, keep sustained tones short, and never start a sweep with headphones already on your ears.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can I test headphones, earbuds and Bluetooth devices?</summary>
+      <div class="faq__a">
+        <p>Yes, all of them. The test plays through whatever your system currently uses for output, so select your headphones as the default device first.</p>
+        <p>Bluetooth adds noticeable delay between pressing a button and hearing the tone. That lag is the wireless link, not a fault, and it does not affect the channel or frequency results.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can I choose which output device the test uses?</summary>
+      <div class="faq__a">
+        <p>Where the browser allows it, yes, and an output picker appears. Chrome and Edge support choosing an output device from a web page; Firefox and Safari generally do not.</p>
+        <p>When no picker is available, change your default output in system sound settings and the test follows it.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What causes crackling or popping during the test?</summary>
+      <div class="faq__a">
+        <p>Crackling that appears at every frequency usually means a buffer problem on the computer rather than the speaker: a busy CPU, an aggressive power saving setting, or a driver that needs updating.</p>
+        <p>Crackling that only appears around certain frequencies, or that you can make worse by touching the cable, is physical. A damaged cable, a loose connector or a torn driver all sound like that.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why is there a delay before I hear anything?</summary>
+      <div class="faq__a">
+        <p>Browsers suspend audio until you interact with the page, so the first press both starts the audio engine and plays the sound. Later presses respond immediately.</p>
+        <p>Bluetooth output adds its own delay on top, typically between 100 and 300 milliseconds depending on the codec.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Does this test speaker quality or just whether they work?</summary>
+      <div class="faq__a">
+        <p>It tests function rather than fidelity: which channel is which, whether both work, whether anything rattles, and how far the system reaches at each end of the range.</p>
+        <p>Judging tonal quality needs a measurement microphone and a treated room. What this page reliably catches is the faults that matter: a dead side, a swapped pair, a buzzing driver, or a device that quietly collapsed to mono.</p>
+      </div>
+    </details>
+    </div>
+  </section>
+
+  <!-- other tools -->
+  <section class="section" id="more" aria-labelledby="h-more">
+    <div class="section__head">
+      <h2 id="h-more">Test the rest of your setup</h2>
+      <p>Every tool runs in this tab, reads your hardware directly through the browser, and stores nothing.</p>
+    </div>
+    <div class="tools">
+    <a class="tool" href="/">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><b>Gamepad</b></span>
+      <p>Check buttons, analog sticks, triggers, the D-pad and rumble, and measure stick drift.</p>
+    </a>
+    <a class="tool" href="/microphone-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-mic"></use></svg><b>Microphone</b></span>
+      <p>Live waveform, level meter in dBFS, noise floor reading, and instant record and playback.</p>
+    </a>
+    <a class="tool" href="/keyboard-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><b>Keyboard</b></span>
+      <p>Light up a full layout key by key, read live key codes, and test N-key rollover.</p>
+    </a>
+    <a class="tool" href="/mouse-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><b>Mouse</b></span>
+      <p>Buttons, scroll wheel, movement trace, polling rate in Hz, and a double-click chatter check.</p>
+    </a>
+    <a class="tool" href="/webcam-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-camera"></use></svg><b>Webcam</b></span>
+      <p>Live preview, real resolution and measured frame rate, camera switching and snapshots.</p>
+    </a>
+    <a class="tool" href="/screen-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-display"></use></svg><b>Screen</b></span>
+      <p>Dead pixel hunt, backlight bleed check, gradient banding, and a measured refresh rate.</p>
+    </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav class="foot-links" aria-label="All tests">
+      <a href="/">Gamepad test</a>
+      <a href="/">Gamepad</a>
+      <a href="/microphone-test">Microphone</a>
+      <a href="/keyboard-test">Keyboard</a>
+      <a href="/mouse-test">Mouse</a>
+      <a href="/webcam-test">Webcam</a>
+      <a href="/screen-test">Screen</a>
+    </nav>
+    <div class="grid">
+      <p class="sig c6"><b>Melted Code</b> — browser hardware diagnostics</p>
+      <p class="foot-note c6">Runs entirely on your device. Nothing you press, say or show is recorded or uploaded.</p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  "use strict";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var statusEl = $("status"), statusText = $("statusText");
+
+  var actx = null, master = null, panner = null;
+  var tone = null, toneGain = null, wave = "sine";
+  var sweepOsc = null, sweepGain = null, sweepRaf = null, sweepT0 = 0, sweepDur = 20, sweepHz = 0;
+  var burstTimer = null;
+
+  var LO = 20, HI = 20000;
+
+  /* ── audio graph, built on first gesture ───────────────────────────── */
+  function audio(){
+    if (actx) { if (actx.state === "suspended") actx.resume(); return actx; }
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    master = actx.createGain();
+    master.gain.value = vol();
+    master.connect(actx.destination);
+
+    panner = actx.createStereoPanner ? actx.createStereoPanner() : null;
+    if (panner){ panner.pan.value = parseFloat($("bal").value); panner.connect(master); }
+
+    $("dRate").textContent = (actx.sampleRate / 1000).toFixed(1) + " kHz";
+    $("dCh").textContent = actx.destination.maxChannelCount || actx.destination.channelCount || 2;
+    var lat = (actx.outputLatency || actx.baseLatency || 0) * 1000;
+    $("dLat").textContent = lat ? lat.toFixed(0) + " ms" : "not reported";
+
+    listOutputs();
+    return actx;
+  }
+
+  function busEnd(){ return panner || master; }
+
+  function vol(){
+    var v = parseFloat($("vol").value) / 100;
+    return Math.pow(v, 1.6);
+  }
+
+  function live(on, label){
+    statusEl.classList.toggle("is-live", !!on);
+    statusText.textContent = label || (on ? "Playing" : "Audio idle");
+  }
+
+  /* ── pink noise buffer ─────────────────────────────────────────────── */
+  var pinkBuf = null;
+  function pink(){
+    if (pinkBuf) return pinkBuf;
+    var ctx = audio(), len = Math.floor(ctx.sampleRate * 2);
+    pinkBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var d = pinkBuf.getChannelData(0);
+    var b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for (var i = 0; i < len; i++){
+      var w = Math.random() * 2 - 1;
+      b0 = 0.99886*b0 + w*0.0555179;
+      b1 = 0.99332*b1 + w*0.0750759;
+      b2 = 0.96900*b2 + w*0.1538520;
+      b3 = 0.86650*b3 + w*0.3104856;
+      b4 = 0.55000*b4 + w*0.5329522;
+      b5 = -0.7616*b5 - w*0.0168980;
+      d[i] = (b0+b1+b2+b3+b4+b5+b6+w*0.5362) * 0.11;
+      b6 = w * 0.115926;
+    }
+    return pinkBuf;
+  }
+
+  /* ── channel bursts ────────────────────────────────────────────────── */
+  function burst(side){
+    var ctx = audio();
+    stopBurst();
+
+    var src = ctx.createBufferSource();
+    src.buffer = pink();
+    src.loop = true;
+
+    var g = ctx.createGain();
+    var now = ctx.currentTime, dur = 1.15;
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(1, now + 0.04);
+    g.gain.setValueAtTime(1, now + dur - 0.12);
+    g.gain.linearRampToValueAtTime(0, now + dur);
+
+    var merge = ctx.createChannelMerger(2);
+    src.connect(g);
+    if (side === "L" || side === "B") g.connect(merge, 0, 0);
+    if (side === "R" || side === "B") g.connect(merge, 0, 1);
+    merge.connect(master);
+
+    src.start(now);
+    src.stop(now + dur + 0.02);
+
+    $("coneL").classList.toggle("on", side === "L" || side === "B");
+    $("coneR").classList.toggle("on", side === "R" || side === "B");
+    live(true, side === "L" ? "Playing left channel" : side === "R" ? "Playing right channel" : "Playing both channels");
+    $("verdict").textContent = side === "B"
+      ? "Both channels. The sound should feel centred between your speakers, not stuck to one side."
+      : "Sound should be coming from the " + (side === "L" ? "left" : "right") + " only. If it is not, your channels are swapped.";
+
+    burstTimer = setTimeout(function(){
+      $("coneL").classList.remove("on");
+      $("coneR").classList.remove("on");
+      if (!tone && !sweepOsc) live(false);
+    }, dur * 1000);
+  }
+
+  function stopBurst(){
+    clearTimeout(burstTimer);
+    $("coneL").classList.remove("on");
+    $("coneR").classList.remove("on");
+  }
+
+  $("playL").addEventListener("click", function(){ burst("L"); });
+  $("playR").addEventListener("click", function(){ burst("R"); });
+  $("playBoth").addEventListener("click", function(){ burst("B"); });
+
+  /* ── frequency slider ──────────────────────────────────────────────── */
+  function sliderHz(v){ return Math.round(LO * Math.pow(HI / LO, v / 1000)); }
+  function hzSlider(hz){ return Math.round(1000 * Math.log(hz / LO) / Math.log(HI / LO)); }
+
+  function band(hz){
+    if (hz < 40) return "sub-bass, felt more than heard";
+    if (hz < 160) return "bass";
+    if (hz < 400) return "low mids";
+    if (hz < 2000) return "midrange, where voices live";
+    if (hz < 6000) return "presence";
+    if (hz < 12000) return "brilliance";
+    return "ultra-high, the first range most adults lose";
+  }
+
+  function fmtHz(hz){ return hz >= 1000 ? (hz / 1000).toFixed(hz >= 10000 ? 1 : 2) + " kHz" : hz + " Hz"; }
+
+  function updateFreq(){
+    var hz = sliderHz(parseFloat($("freq").value));
+    $("freqVal").textContent = hz >= 1000 ? (hz / 1000).toFixed(hz >= 10000 ? 1 : 2) : hz;
+    document.querySelector(".freqbig span").textContent = hz >= 1000 ? "kHz" : "Hz";
+    $("freqOut").textContent = fmtHz(hz) + " — " + band(hz);
+    if (tone && tone.frequency) tone.frequency.setTargetAtTime(hz, actx.currentTime, 0.02);
+    return hz;
+  }
+  $("freq").addEventListener("input", updateFreq);
+  updateFreq();
+
+  document.querySelectorAll(".presets .btn").forEach(function(b){
+    b.addEventListener("click", function(){
+      $("freq").value = hzSlider(parseFloat(b.dataset.hz));
+      updateFreq();
+      if (!tone) playTone();
+    });
+  });
+
+  document.querySelectorAll(".wavepick .btn").forEach(function(b){
+    b.addEventListener("click", function(){
+      wave = b.dataset.wave;
+      document.querySelectorAll(".wavepick .btn").forEach(function(o){ o.classList.toggle("on", o === b); });
+      if (tone){ stopTone(); playTone(); }
+    });
+  });
+
+  /* ── tone ──────────────────────────────────────────────────────────── */
+  function playTone(){
+    var ctx = audio();
+    stopTone();
+    var hz = updateFreq();
+    var now = ctx.currentTime;
+
+    toneGain = ctx.createGain();
+    toneGain.gain.setValueAtTime(0, now);
+    toneGain.gain.linearRampToValueAtTime(1, now + 0.05);
+    toneGain.connect(busEnd());
+
+    if (wave === "noise"){
+      tone = ctx.createBufferSource();
+      tone.buffer = pink();
+      tone.loop = true;
+    } else {
+      tone = ctx.createOscillator();
+      tone.type = wave;
+      tone.frequency.value = hz;
+    }
+    tone.connect(toneGain);
+    tone.start(now);
+
+    $("toneGo").disabled = true;
+    $("toneStop").disabled = false;
+    $("toneNote").textContent = wave === "noise" ? "pink noise" : fmtHz(hz) + " " + wave;
+    live(true, "Playing a tone");
+  }
+
+  function stopTone(){
+    if (!tone) return;
+    var now = actx.currentTime;
+    try {
+      toneGain.gain.cancelScheduledValues(now);
+      toneGain.gain.setValueAtTime(toneGain.gain.value, now);
+      toneGain.gain.linearRampToValueAtTime(0, now + 0.05);
+      tone.stop(now + 0.07);
+    } catch (e){}
+    tone = null; toneGain = null;
+    $("toneGo").disabled = false;
+    $("toneStop").disabled = true;
+    $("toneNote").textContent = "idle";
+    if (!sweepOsc) live(false);
+  }
+
+  $("toneGo").addEventListener("click", playTone);
+  $("toneStop").addEventListener("click", stopTone);
+
+  /* ── sweep ─────────────────────────────────────────────────────────── */
+  $("dur").addEventListener("input", function(){
+    sweepDur = parseFloat($("dur").value);
+    $("durOut").textContent = sweepDur + " s";
+  });
+
+  function startSweep(){
+    var ctx = audio();
+    stopSweep(true);
+    sweepDur = parseFloat($("dur").value);
+
+    var now = ctx.currentTime;
+    sweepGain = ctx.createGain();
+    sweepGain.gain.setValueAtTime(0, now);
+    sweepGain.gain.linearRampToValueAtTime(1, now + 0.06);
+    sweepGain.gain.setValueAtTime(1, now + sweepDur - 0.1);
+    sweepGain.gain.linearRampToValueAtTime(0, now + sweepDur);
+    sweepGain.connect(busEnd());
+
+    sweepOsc = ctx.createOscillator();
+    sweepOsc.type = "sine";
+    sweepOsc.frequency.setValueAtTime(LO, now);
+    sweepOsc.frequency.exponentialRampToValueAtTime(HI, now + sweepDur);
+    sweepOsc.connect(sweepGain);
+    sweepOsc.start(now);
+    sweepOsc.stop(now + sweepDur + 0.05);
+    sweepOsc.onended = function(){ stopSweep(); };
+
+    sweepT0 = performance.now();
+    $("sweepGo").textContent = "Stop sweep";
+    $("sweepMark").disabled = false;
+    $("sweepResult").hidden = true;
+    live(true, "Sweeping the audible range");
+    tick();
+  }
+
+  function tick(){
+    var t = (performance.now() - sweepT0) / 1000;
+    var p = Math.min(1, t / sweepDur);
+    sweepHz = Math.round(LO * Math.pow(HI / LO, p));
+    $("sweepHz").textContent = sweepHz >= 1000 ? (sweepHz / 1000).toFixed(1) + "k" : sweepHz;
+    $("sweepFill").style.width = (p * 100).toFixed(1) + "%";
+    if (p < 1) sweepRaf = requestAnimationFrame(tick);
+  }
+
+  function stopSweep(quiet){
+    if (sweepRaf){ cancelAnimationFrame(sweepRaf); sweepRaf = null; }
+    if (sweepOsc){
+      try { sweepOsc.onended = null; sweepOsc.stop(); } catch (e){}
+      sweepOsc = null; sweepGain = null;
+    }
+    $("sweepGo").textContent = "Start sweep";
+    $("sweepMark").disabled = true;
+    if (!quiet && !tone) live(false);
+  }
+
+  $("sweepGo").addEventListener("click", function(){
+    if (sweepOsc) stopSweep(); else startSweep();
+  });
+
+  $("sweepMark").addEventListener("click", function(){
+    var hz = sweepHz;
+    stopSweep();
+    var msg;
+    if (hz >= 17000) msg = "You heard up to " + fmtHz(hz) + ". That is excellent, and typical of ears under about 25.";
+    else if (hz >= 15000) msg = "You heard up to " + fmtHz(hz) + ". That is a healthy result for an adult.";
+    else if (hz >= 12000) msg = "You heard up to " + fmtHz(hz) + ". Normal for middle age, and nothing to worry about on its own.";
+    else if (hz >= 8000) msg = "You heard up to " + fmtHz(hz) + ". Worth repeating on headphones, since small speakers roll off early and can mimic this.";
+    else msg = "You stopped at " + fmtHz(hz) + ", which is low enough that the equipment is the more likely explanation. Try again on headphones at a comfortable volume.";
+    $("sweepMsg").textContent = msg;
+    $("sweepResult").className = "note ok";
+    $("sweepResult").hidden = false;
+  });
+
+  /* ── output controls ───────────────────────────────────────────────── */
+  $("vol").addEventListener("input", function(){
+    $("volOut").textContent = $("vol").value + "%";
+    if (master) master.gain.setTargetAtTime(vol(), actx.currentTime, 0.02);
+  });
+
+  $("bal").addEventListener("input", function(){
+    var v = parseFloat($("bal").value);
+    $("balOut").textContent = Math.abs(v) < 0.03 ? "centre"
+      : (v < 0 ? Math.round(-v * 100) + "% left" : Math.round(v * 100) + "% right");
+    if (panner) panner.pan.setTargetAtTime(v, actx.currentTime, 0.02);
+  });
+
+  $("stopAll").addEventListener("click", function(){
+    stopTone(); stopSweep(); stopBurst(); live(false);
+  });
+
+  /* ── output device picker, where the browser allows it ─────────────── */
+  function listOutputs(){
+    if (!actx || typeof actx.setSinkId !== "function") return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+    navigator.mediaDevices.enumerateDevices().then(function(all){
+      var outs = all.filter(function(d){ return d.kind === "audiooutput"; });
+      if (outs.length < 2) return;
+      var sel = $("sinks");
+      sel.innerHTML = "";
+      outs.forEach(function(d, i){
+        var o = document.createElement("option");
+        o.value = d.deviceId;
+        o.textContent = d.label || ("Output " + (i + 1));
+        sel.appendChild(o);
+      });
+      $("sinkWrap").hidden = false;
+      sel.onchange = function(){
+        actx.setSinkId(sel.value).then(function(){
+          $("outNote").textContent = "custom output";
+        }).catch(function(){
+          $("outNote").textContent = "could not switch";
+        });
+      };
+    }).catch(function(){});
+  }
+
+  window.addEventListener("pagehide", function(){
+    stopTone(); stopSweep(); stopBurst();
+    if (actx) actx.close().catch(function(){});
+  });
+})();
+
+</script>
+</body>
+</html>

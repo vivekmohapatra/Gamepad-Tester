@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Screen Test — Dead Pixel, Backlight Bleed and Colour Banding Check</title>
+<meta name="description" content="Free online screen test. Cycle full-screen colours to find dead and stuck pixels, check backlight bleed on black, spot colour banding on gradients, and measure your actual refresh rate.">
+<link rel="canonical" href="https://gamepad-tester.vercel.app/screen-test">
+<meta name="theme-color" content="#14181C">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hardware Test Bench">
+<meta property="og:title" content="Screen Test — Dead Pixel, Backlight Bleed and Colour Banding Check">
+<meta property="og:description" content="Free online screen test. Cycle full-screen colours to find dead and stuck pixels, check backlight bleed on black, spot colour banding on gradients, and measure your actual refresh rate.">
+<meta property="og:url" content="https://gamepad-tester.vercel.app/screen-test">
+<meta property="og:image" content="https://gamepad-tester.vercel.app/og.png">
+<meta property="og:image:alt" content="A dark instrument panel lighting up as hardware is tested.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Screen Test — Dead Pixel, Backlight Bleed and Colour Banding Check">
+<meta name="twitter:description" content="Free online screen test. Cycle full-screen colours to find dead and stuck pixels, check backlight bleed on black, spot colour banding on gradients, and measure your actual refresh rate.">
+<meta name="twitter:image" content="https://gamepad-tester.vercel.app/og.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap"></noscript>
+<link rel="stylesheet" href="/assets/base.css">
+<style>
+/* ── swatches ───────────────────────────────────────────────────────── */
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:900px){ .swatches{grid-template-columns:repeat(3,1fr)} }
+@media (max-width:560px){ .swatches{grid-template-columns:repeat(2,1fr)} }
+
+.sw{
+  display:grid;gap:6px;
+  padding:10px;
+  background:var(--panel-hi);
+  border:1px solid var(--rule);
+  border-radius:var(--r-chip);
+  cursor:pointer;text-align:left;
+  transition:border-color .15s,background .15s;
+}
+.sw:hover{border-color:var(--dim)}
+.sw i{
+  display:block;height:38px;border-radius:2px;
+  border:1px solid rgba(255,255,255,.12);
+}
+.sw span{font-size:13px;font-weight:500}
+.sw em{font-style:normal;font-size:11.5px;color:var(--dim)}
+
+.sw__grad{background:linear-gradient(90deg,#000,#fff)}
+.sw__greys{background:linear-gradient(90deg,#000 0 20%,#404040 20% 40%,#808080 40% 60%,#bfbfbf 60% 80%,#fff 80%)}
+.sw__flash{background:linear-gradient(90deg,#f00 0 33%,#0f0 33% 66%,#00f 66%)}
+
+/* ── inline strips ──────────────────────────────────────────────────── */
+.strip{margin:0 0 18px}
+.strip:last-child{margin-bottom:0}
+.strip__bar{
+  height:46px;border-radius:2px;
+  border:1px solid var(--rule-soft);
+}
+.strip__bar--grad{background:linear-gradient(90deg,#000,#fff)}
+.strip__bar--sharp{
+  background:repeating-linear-gradient(90deg,#000 0 1px,#fff 1px 2px);
+}
+.strip__steps{display:flex}
+.strip__steps i{flex:1}
+.strip figcaption{
+  font-size:12.5px;color:var(--muted);
+  padding-top:8px;max-width:72ch;line-height:1.5;
+}
+
+/* ── full screen ────────────────────────────────────────────────────── */
+.full{
+  position:fixed;inset:0;z-index:200;
+  background:#000;
+  cursor:none;
+}
+.full[hidden]{display:none}
+.full__fill{position:absolute;inset:0}
+.full__fill--grad{background:linear-gradient(90deg,#000,#fff)}
+.full__fill--greys{display:flex}
+.full__fill--greys i{flex:1;height:100%}
+.full__fill--flash{animation:pixflash .38s steps(1,end) infinite}
+@keyframes pixflash{
+  0%{background:#f00}
+  25%{background:#0f0}
+  50%{background:#00f}
+  75%{background:#fff}
+  100%{background:#000}
+}
+
+.full__bar{
+  position:absolute;left:50%;bottom:26px;transform:translateX(-50%);
+  display:flex;align-items:center;gap:16px;
+  padding:9px 10px 9px 18px;
+  background:rgba(20,24,28,.86);
+  border:1px solid var(--rule);
+  border-radius:100px;
+  backdrop-filter:blur(6px);
+  font-size:13px;color:var(--text);
+  opacity:0;pointer-events:none;
+  transition:opacity .25s;
+  max-width:calc(100vw - 32px);
+}
+.full__bar.show{opacity:1;pointer-events:auto}
+.full__hint{font-size:11.5px;color:var(--dim)}
+.full__bar{cursor:default}
+.full__bar .btn{cursor:pointer}
+.full__bar .btn{padding:6px 12px;font-size:12.5px}
+@media (max-width:640px){ .full__hint{display:none} }
+
+.note__msg{font-size:12.5px;color:var(--muted);line-height:1.45}
+.spec dd{color:var(--muted)}
+
+@media (prefers-reduced-motion:reduce){
+  .full__fill--flash{animation:none;background:#808080}
+}
+
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://gamepad-tester.vercel.app/#website",
+      "url": "https://gamepad-tester.vercel.app/",
+      "name": "Hardware Test Bench",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://gamepad-tester.vercel.app/screen-test#app",
+      "name": "Screen and Dead Pixel Test",
+      "url": "https://gamepad-tester.vercel.app/screen-test",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Windows, macOS, Linux, Android, iOS, ChromeOS",
+      "browserRequirements": "Modern browser, no plugins or downloads",
+      "description": "Browser tool that fills the screen with test patterns to reveal dead pixels, stuck pixels, backlight bleed and colour banding, and measures refresh rate.",
+      "isPartOf": {
+        "@id": "https://gamepad-tester.vercel.app/#website"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://gamepad-tester.vercel.app/screen-test#crumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://gamepad-tester.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Screen",
+          "item": "https://gamepad-tester.vercel.app/screen-test"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://gamepad-tester.vercel.app/screen-test#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the difference between a dead pixel and a stuck pixel?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A dead pixel receives no power and stays black on every colour, including a full white field. A stuck pixel is permanently lit in one colour, so it shows as a bright red, green, blue or white dot against black. The distinction matters because stuck pixels sometimes recover on their own or with a flashing pattern, while dead pixels effectively never do."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can this fix a stuck pixel?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sometimes. The flashing pattern rapidly cycles colours to exercise a sub-pixel that has got lodged, and it does occasionally free one. Leave it running over the affected area for ten to thirty minutes. It is not guaranteed and it does nothing for a genuinely dead pixel. If the flashing is uncomfortable to watch, look away, and skip it entirely if you are sensitive to flashing light."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many dead pixels are normal on a new screen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "More than most people expect. Manufacturers work to published defect policies, and many will not consider a panel faulty until several dead sub-pixels are present, or one is in the central zone. Test a new monitor or laptop as soon as it arrives and photograph anything you find, because return windows are short and the evidence is easier to gather on day one."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is backlight bleed and is mine too much?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Backlight bleed is light escaping around the edges of an LCD, visible as brighter patches on a black field in a dark room. It is a byproduct of how LCDs are built and essentially every LCD has some. Judge it in normal viewing rather than face-on in a blacked-out room, where every panel looks bad. If you notice it during ordinary use, it is excessive; if you can only find it while hunting for it, it is normal."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is IPS glow and how is it different?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "IPS glow is a silvery haze in the corners that shifts as you move your head, and it is inherent to the IPS panel type rather than a defect. Backlight bleed stays put when you move. That movement test is the quickest way to tell them apart, and it matters because glow is not covered by any warranty while severe bleed sometimes is."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What causes colour banding on the gradient?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Visible steps instead of a smooth fade usually mean the panel or the pipeline is working at a lower colour depth than the image needs. Many panels are 8-bit or 6-bit with dithering. Before assuming the panel, check the colour depth setting in your graphics control panel, and check the cable: an under-specified HDMI or DisplayPort cable at high resolution and refresh rate will reduce depth to keep up."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the refresh rate reading accurate?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It measures how often the browser can actually paint, which normally matches your display's refresh rate closely. It is a good check of whether a high refresh monitor is genuinely running at its rated speed. Variable refresh rate, battery saving modes and a busy machine can all pull the reading below the panel's maximum, so take a reading with the system otherwise idle."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I test for OLED burn-in with this?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, and the solid colour fields are the right tool. Burn-in appears as a faint permanent ghost of something previously shown, usually a taskbar, a logo or a heads-up display, and it is most visible on a mid-grey or a solid colour field. Uniform full-screen colour also drives most OLED panels' own pixel refresh routines, which is a reasonable maintenance habit for a screen that shows static content."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the test work on a phone, tablet or TV?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Full-screen mode works on most mobile browsers, though iOS Safari restricts it in places, in which case scroll the page so the colour field fills the display. On a TV, open the page in the built-in browser or cast a laptop to it. Turn off any motion smoothing and dynamic contrast processing first, because both alter what you are trying to measure."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why should I test in a dark room?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ambient light washes out exactly the faults you are looking for. Backlight bleed, clouding, black uniformity and faint stuck pixels are all low-contrast details that room light hides completely. Bright fields are the exception: check white and light grey in normal lighting, since that is where dead pixels and dust show best."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "@id": "https://gamepad-tester.vercel.app/screen-test#howto",
+      "name": "How to use the screen and dead pixel test",
+      "totalTime": "PT2M",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Clean the screen and dim the room",
+          "text": "Wipe the panel with a dry microfibre cloth. A speck of dust on black looks exactly like a stuck white pixel until you touch it. Turn the lights down. Backlight bleed and clouding are invisible in a bright room and obvious in a dark one.",
+          "url": "https://gamepad-tester.vercel.app/screen-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Cycle every colour field",
+          "text": "Go full screen and step through black, white, red, green and blue. Look across the whole panel each time rather than staring at the centre. A pixel that stays black on white is dead. One that stays red, green or blue on every field is stuck. Dead is permanent; stuck sometimes recovers.",
+          "url": "https://gamepad-tester.vercel.app/screen-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Check gradients and refresh rate",
+          "text": "The gradient field reveals banding: visible steps instead of a smooth fade, which points at an 8-bit panel, a low colour depth setting, or an aggressive cable. The refresh reading shows what your browser is actually getting. If you paid for 144 Hz and see 60, check the display settings and the cable before anything else.",
+          "url": "https://gamepad-tester.vercel.app/screen-test#how-to"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C9C7L3L68W"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-C9C7L3L68W');
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8a4 4 0 0 1 3.9 3.1l1 4.4c.4 1.9-2 2.9-3 1.3l-1.6-2.5a1.5 1.5 0 0 0-1.3-.7H8.9a1.5 1.5 0 0 0-1.3.7l-1.5 2.5c-1 1.6-3.4.6-3-1.3l1-4.4A4 4 0 0 1 8 9z"/><path d="M8.2 11.5v2.2M7.1 12.6h2.2"/><circle cx="15.8" cy="12.6" r=".95" fill="currentColor" stroke="none"/></symbol><symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9.5" y="2.8" width="5" height="10.4" rx="2.5"/><path d="M5.6 11.2a6.4 6.4 0 0 0 12.8 0"/><path d="M12 17.6v3.6"/></symbol><symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 9.4h3l4.4-3.7a.8.8 0 0 1 1.3.6v11.4a.8.8 0 0 1-1.3.6l-4.4-3.7h-3a.9.9 0 0 1-.9-.9v-3.4a.9.9 0 0 1 .9-.9z"/><path d="M16.6 9.2a4 4 0 0 1 0 5.6M19.2 6.6a7.6 7.6 0 0 1 0 10.8"/></symbol><symbol id="i-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="6" width="19.2" height="12" rx="2"/><path d="M6 9.6h.01M9.6 9.6h.01M13.2 9.6h.01M16.8 9.6h.01M6 12.9h.01M9.6 12.9h.01M13.2 12.9h.01M16.8 12.9h.01M8.2 15.7h7.6"/></symbol><symbol id="i-mouse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6.4" y="2.5" width="11.2" height="19" rx="5.6"/><path d="M12 6.4v3.8"/></symbol><symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.6 8.6h3.2l1.5-2.6h9.4l1.5 2.6h3.2a.9.9 0 0 1 .9.9v8a.9.9 0 0 1-.9.9H2.6a.9.9 0 0 1-.9-.9v-8a.9.9 0 0 1 .9-.9z"/><circle cx="12" cy="13.4" r="3.4"/></symbol><symbol id="i-display" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="4" width="19.2" height="13" rx="2"/><path d="M9 21.2h6M12 17.2v4"/></symbol></defs></svg>
+
+<header class="masthead">
+  <div class="wrap grid">
+    <div class="c7">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z" fill="#c9cfd6"/>
+          <circle cx="21.5" cy="16.5" r="1.9" fill="#ff7a18"/>
+          <rect x="8" y="15.4" width="6" height="2.2" rx="1.1" fill="#14181c"/>
+          <rect x="9.9" y="13.5" width="2.2" height="6" rx="1.1" fill="#14181c"/>
+        </svg>
+        <span class="brandname">Hardware Test Bench</span>
+      </a>
+      <h1>Screen test</h1>
+      <p class="tagline">Full-screen colour fields for finding dead pixels, backlight bleed and banding, plus a live refresh rate reading.</p>
+    </div>
+    <div class="c5 status-wrap">
+      <p class="status" id="status" role="status" aria-live="polite">
+        <span class="status__dot" aria-hidden="true"></span>
+        <span id="statusText">Ready</span>
+      </p>
+    </div>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Hardware tests">
+  <div class="wrap rail__inner">
+      <a href="/"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><span>Gamepad</span></a>
+      <a href="/microphone-test"><svg aria-hidden="true"><use href="#i-mic"></use></svg><span>Microphone</span></a>
+      <a href="/speaker-test"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><span>Speakers</span></a>
+      <a href="/keyboard-test"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><span>Keyboard</span></a>
+      <a href="/mouse-test"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><span>Mouse</span></a>
+      <a href="/webcam-test"><svg aria-hidden="true"><use href="#i-camera"></use></svg><span>Webcam</span></a>
+      <a href="/screen-test" aria-current="page"><svg aria-hidden="true"><use href="#i-display"></use></svg><span>Screen</span></a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- patterns -->
+    <section class="panel c8" aria-labelledby="h-pat">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-pat">Test patterns</h2>
+        <span class="panel__note">arrow keys step, Esc exits</span>
+      </div>
+
+      <p class="prose" style="font-size:13.5px;margin-bottom:16px">
+        Pick a field and the whole screen fills with it. Wipe the panel first, because dust on a
+        black field is indistinguishable from a stuck pixel until you touch it.
+      </p>
+
+      <div class="swatches" id="swatches">
+        <button class="sw" data-fill="#000000"><i style="background:#000"></i><span>Black</span><em>dead pixels, bleed</em></button>
+        <button class="sw" data-fill="#ffffff"><i style="background:#fff"></i><span>White</span><em>dust, stuck pixels</em></button>
+        <button class="sw" data-fill="#ff0000"><i style="background:#f00"></i><span>Red</span><em>sub-pixel check</em></button>
+        <button class="sw" data-fill="#00ff00"><i style="background:#0f0"></i><span>Green</span><em>sub-pixel check</em></button>
+        <button class="sw" data-fill="#0000ff"><i style="background:#00f"></i><span>Blue</span><em>sub-pixel check</em></button>
+        <button class="sw" data-fill="#808080"><i style="background:#808080"></i><span>Mid grey</span><em>uniformity, burn-in</em></button>
+        <button class="sw" data-fill="#00ffff"><i style="background:#0ff"></i><span>Cyan</span><em>colour balance</em></button>
+        <button class="sw" data-fill="#ff00ff"><i style="background:#f0f"></i><span>Magenta</span><em>colour balance</em></button>
+        <button class="sw" data-fill="#ffff00"><i style="background:#ff0"></i><span>Yellow</span><em>colour balance</em></button>
+        <button class="sw" data-fill="gradient"><i class="sw__grad"></i><span>Gradient</span><em>colour banding</em></button>
+        <button class="sw" data-fill="greys"><i class="sw__greys"></i><span>Grey steps</span><em>black and white crush</em></button>
+        <button class="sw" data-fill="flash"><i class="sw__flash"></i><span>Pixel flash</span><em>unstick a pixel</em></button>
+      </div>
+
+      <div class="btnrow" style="margin-top:18px">
+        <button class="btn btn--go" id="startAll">Run every pattern in order</button>
+        <button class="btn" id="cycle">Auto-advance: off</button>
+      </div>
+    </section>
+
+    <!-- display -->
+    <section class="panel c4" aria-labelledby="h-disp">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-disp">This display</h2>
+        <span class="panel__note" id="vrrNote">measuring</span>
+      </div>
+
+      <p class="tally"><strong id="hz">—</strong><span>Hz measured refresh</span></p>
+
+      <div class="meter" style="margin-bottom:18px">
+        <b>Steadiness</b>
+        <div class="meter__track"><div class="meter__fill meter__fill--analog" id="steadyFill"></div></div>
+        <span class="meter__val" id="steadyVal">—</span>
+      </div>
+
+      <dl class="spec">
+        <div><dt>Screen resolution</dt><dd id="dScreen">—</dd></div>
+        <div><dt>In CSS pixels</dt><dd id="dCss">—</dd></div>
+        <div><dt>Device pixel ratio</dt><dd id="dDpr">—</dd></div>
+        <div><dt>Colour depth</dt><dd id="dDepth">—</dd></div>
+        <div><dt>Colour gamut</dt><dd id="dGamut">—</dd></div>
+        <div><dt>Dynamic range</dt><dd id="dHdr">—</dd></div>
+        <div><dt>Orientation</dt><dd id="dOrient">—</dd></div>
+      </dl>
+    </section>
+
+    <!-- inline checks -->
+    <section class="panel c8" aria-labelledby="h-inline">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-inline">Quick checks without going full screen</h2>
+        <span class="panel__note">read these at arm's length</span>
+      </div>
+
+      <figure class="strip">
+        <div class="strip__bar strip__bar--grad"></div>
+        <figcaption>Black to white. Any visible step edges mean banding rather than a smooth
+        fade — check your colour depth setting and your cable before blaming the panel.</figcaption>
+      </figure>
+
+      <figure class="strip">
+        <div class="strip__bar strip__steps" id="darkSteps"></div>
+        <figcaption>Near-black steps. You should be able to count distinct bands. If the first few
+        merge into one, your black level is crushing shadow detail.</figcaption>
+      </figure>
+
+      <figure class="strip">
+        <div class="strip__bar strip__steps" id="lightSteps"></div>
+        <figcaption>Near-white steps. Merged bands at this end mean highlights are clipping, which
+        is usually a brightness or contrast setting pushed too far.</figcaption>
+      </figure>
+
+      <figure class="strip">
+        <div class="strip__bar strip__bar--sharp"></div>
+        <figcaption>One-pixel lines. These should look crisp and even. Blurring, shimmering or a
+        colour fringe points at a non-native resolution or a scaling setting.</figcaption>
+      </figure>
+    </section>
+
+    <!-- guidance -->
+    <section class="panel c4" aria-labelledby="h-find">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-find">What you are looking for</h2>
+      </div>
+      <dl class="spec">
+        <div><dt>Black on every field</dt><dd>dead pixel</dd></div>
+        <div><dt>One colour always lit</dt><dd>stuck pixel</dd></div>
+        <div><dt>Bright edges on black</dt><dd>backlight bleed</dd></div>
+        <div><dt>Corner haze that moves</dt><dd>IPS glow</dd></div>
+        <div><dt>Steps in a fade</dt><dd>banding</dd></div>
+        <div><dt>Faint permanent ghost</dt><dd>burn-in</dd></div>
+      </dl>
+      <div class="note" style="margin-top:16px">
+        <p class="note__msg">Dead pixels do not recover. Stuck pixels sometimes do, and the pixel
+        flash pattern is the usual attempt. Give it ten to thirty minutes, and skip it entirely if
+        flashing light bothers you.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- full screen overlay -->
+  <div class="full" id="full" hidden tabindex="-1" role="dialog" aria-modal="true" aria-label="Full screen test pattern">
+    <div class="full__fill" id="fullFill"></div>
+    <div class="full__bar" id="fullBar">
+      <span id="fullName">Black</span>
+      <span class="full__hint">&#8592; &#8594; to step &middot; Esc to exit &middot; move the pointer to show this bar</span>
+      <button class="btn" id="fullExit">Exit</button>
+    </div>
+  </div>
+
+  <div class="info grid">
+    <article class="c4">
+      <h2>Test it the week it arrives</h2>
+      <p>Manufacturers publish defect policies, and many will not treat a panel as faulty until
+      several dead sub-pixels are present or one sits in the central zone. Return windows are short,
+      so check a new monitor or laptop on day one and photograph anything you find.</p>
+    </article>
+    <article class="c4">
+      <h2>Bleed against glow</h2>
+      <p>Move your head. Backlight bleed stays exactly where it is; IPS glow shifts and fades as
+      your viewing angle changes. That one test separates a possible warranty claim from a normal
+      property of the panel technology you bought.</p>
+    </article>
+    <article class="c4">
+      <h2>Judge it in the room you use</h2>
+      <p>Face-on in a blacked-out room, every LCD looks bad. If you only notice bleed while hunting
+      for it, it is normal. If it interrupts you during an ordinary dark scene at your usual
+      brightness, it is excessive.</p>
+    </article>
+  </div>
+
+
+  <!-- how to use -->
+  <section class="section" id="how-to" aria-labelledby="h-how">
+    <div class="section__head">
+      <h2 id="h-how">How to use the screen test</h2>
+      <p>Clean the screen first. Most suspected dead pixels turn out to be dust, and you will not tell the difference until the screen is a solid colour.</p>
+    </div>
+    <ol class="steps grid">
+      <li class="step c4">
+        <h3>Clean the screen and dim the room</h3>
+        <p>Wipe the panel with a dry microfibre cloth. A speck of dust on black looks exactly like a stuck white pixel until you touch it.</p>
+        <p>Turn the lights down. Backlight bleed and clouding are invisible in a bright room and obvious in a dark one.</p>
+      </li>
+      <li class="step c4">
+        <h3>Cycle every colour field</h3>
+        <p>Go full screen and step through black, white, red, green and blue. Look across the whole panel each time rather than staring at the centre.</p>
+        <p>A pixel that stays black on white is dead. One that stays red, green or blue on every field is stuck. Dead is permanent; stuck sometimes recovers.</p>
+      </li>
+      <li class="step c4">
+        <h3>Check gradients and refresh rate</h3>
+        <p>The gradient field reveals banding: visible steps instead of a smooth fade, which points at an 8-bit panel, a low colour depth setting, or an aggressive cable.</p>
+        <p>The refresh reading shows what your browser is actually getting. If you paid for 144 Hz and see 60, check the display settings and the cable before anything else.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- faq -->
+  <section class="section" id="faq" aria-labelledby="h-faq">
+    <div class="section__head">
+      <h2 id="h-faq">Questions people ask</h2>
+      <p>Dead versus stuck pixels, bleed versus glow, and how much of either is normal.</p>
+    </div>
+    <div class="faq">
+    <details open>
+      <summary>What is the difference between a dead pixel and a stuck pixel?</summary>
+      <div class="faq__a">
+        <p>A dead pixel receives no power and stays black on every colour, including a full white field. A stuck pixel is permanently lit in one colour, so it shows as a bright red, green, blue or white dot against black.</p>
+        <p>The distinction matters because stuck pixels sometimes recover on their own or with a flashing pattern, while dead pixels effectively never do.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can this fix a stuck pixel?</summary>
+      <div class="faq__a">
+        <p>Sometimes. The flashing pattern rapidly cycles colours to exercise a sub-pixel that has got lodged, and it does occasionally free one. Leave it running over the affected area for ten to thirty minutes.</p>
+        <p>It is not guaranteed and it does nothing for a genuinely dead pixel. If the flashing is uncomfortable to watch, look away, and skip it entirely if you are sensitive to flashing light.</p>
+      </div>
+    </details>
+    <details>
+      <summary>How many dead pixels are normal on a new screen?</summary>
+      <div class="faq__a">
+        <p>More than most people expect. Manufacturers work to published defect policies, and many will not consider a panel faulty until several dead sub-pixels are present, or one is in the central zone.</p>
+        <p>Test a new monitor or laptop as soon as it arrives and photograph anything you find, because return windows are short and the evidence is easier to gather on day one.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What is backlight bleed and is mine too much?</summary>
+      <div class="faq__a">
+        <p>Backlight bleed is light escaping around the edges of an LCD, visible as brighter patches on a black field in a dark room. It is a byproduct of how LCDs are built and essentially every LCD has some.</p>
+        <p>Judge it in normal viewing rather than face-on in a blacked-out room, where every panel looks bad. If you notice it during ordinary use, it is excessive; if you can only find it while hunting for it, it is normal.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What is IPS glow and how is it different?</summary>
+      <div class="faq__a">
+        <p>IPS glow is a silvery haze in the corners that shifts as you move your head, and it is inherent to the IPS panel type rather than a defect. Backlight bleed stays put when you move.</p>
+        <p>That movement test is the quickest way to tell them apart, and it matters because glow is not covered by any warranty while severe bleed sometimes is.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What causes colour banding on the gradient?</summary>
+      <div class="faq__a">
+        <p>Visible steps instead of a smooth fade usually mean the panel or the pipeline is working at a lower colour depth than the image needs. Many panels are 8-bit or 6-bit with dithering.</p>
+        <p>Before assuming the panel, check the colour depth setting in your graphics control panel, and check the cable: an under-specified HDMI or DisplayPort cable at high resolution and refresh rate will reduce depth to keep up.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Is the refresh rate reading accurate?</summary>
+      <div class="faq__a">
+        <p>It measures how often the browser can actually paint, which normally matches your display's refresh rate closely. It is a good check of whether a high refresh monitor is genuinely running at its rated speed.</p>
+        <p>Variable refresh rate, battery saving modes and a busy machine can all pull the reading below the panel's maximum, so take a reading with the system otherwise idle.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can I test for OLED burn-in with this?</summary>
+      <div class="faq__a">
+        <p>Yes, and the solid colour fields are the right tool. Burn-in appears as a faint permanent ghost of something previously shown, usually a taskbar, a logo or a heads-up display, and it is most visible on a mid-grey or a solid colour field.</p>
+        <p>Uniform full-screen colour also drives most OLED panels' own pixel refresh routines, which is a reasonable maintenance habit for a screen that shows static content.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Does the test work on a phone, tablet or TV?</summary>
+      <div class="faq__a">
+        <p>Yes. Full-screen mode works on most mobile browsers, though iOS Safari restricts it in places, in which case scroll the page so the colour field fills the display.</p>
+        <p>On a TV, open the page in the built-in browser or cast a laptop to it. Turn off any motion smoothing and dynamic contrast processing first, because both alter what you are trying to measure.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why should I test in a dark room?</summary>
+      <div class="faq__a">
+        <p>Ambient light washes out exactly the faults you are looking for. Backlight bleed, clouding, black uniformity and faint stuck pixels are all low-contrast details that room light hides completely.</p>
+        <p>Bright fields are the exception: check white and light grey in normal lighting, since that is where dead pixels and dust show best.</p>
+      </div>
+    </details>
+    </div>
+  </section>
+
+  <!-- other tools -->
+  <section class="section" id="more" aria-labelledby="h-more">
+    <div class="section__head">
+      <h2 id="h-more">Test the rest of your setup</h2>
+      <p>Every tool runs in this tab, reads your hardware directly through the browser, and stores nothing.</p>
+    </div>
+    <div class="tools">
+    <a class="tool" href="/">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><b>Gamepad</b></span>
+      <p>Check buttons, analog sticks, triggers, the D-pad and rumble, and measure stick drift.</p>
+    </a>
+    <a class="tool" href="/microphone-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-mic"></use></svg><b>Microphone</b></span>
+      <p>Live waveform, level meter in dBFS, noise floor reading, and instant record and playback.</p>
+    </a>
+    <a class="tool" href="/speaker-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><b>Speakers</b></span>
+      <p>Left and right channel checks, a tone generator, and a 20 Hz to 20 kHz hearing sweep.</p>
+    </a>
+    <a class="tool" href="/keyboard-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><b>Keyboard</b></span>
+      <p>Light up a full layout key by key, read live key codes, and test N-key rollover.</p>
+    </a>
+    <a class="tool" href="/mouse-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><b>Mouse</b></span>
+      <p>Buttons, scroll wheel, movement trace, polling rate in Hz, and a double-click chatter check.</p>
+    </a>
+    <a class="tool" href="/webcam-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-camera"></use></svg><b>Webcam</b></span>
+      <p>Live preview, real resolution and measured frame rate, camera switching and snapshots.</p>
+    </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav class="foot-links" aria-label="All tests">
+      <a href="/">Gamepad test</a>
+      <a href="/">Gamepad</a>
+      <a href="/microphone-test">Microphone</a>
+      <a href="/speaker-test">Speakers</a>
+      <a href="/keyboard-test">Keyboard</a>
+      <a href="/mouse-test">Mouse</a>
+      <a href="/webcam-test">Webcam</a>
+    </nav>
+    <div class="grid">
+      <p class="sig c6"><b>Melted Code</b> — browser hardware diagnostics</p>
+      <p class="foot-note c6">Runs entirely on your device. Nothing you press, say or show is recorded or uploaded.</p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  "use strict";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var statusEl = $("status"), statusText = $("statusText");
+  var full = $("full"), fill = $("fullFill"), bar = $("fullBar");
+
+  /* ── the running order used by "run every pattern" and the arrows ──── */
+  var ORDER = [];
+  document.querySelectorAll(".sw").forEach(function(b){
+    ORDER.push({ fill: b.dataset.fill, name: b.querySelector("span").textContent });
+  });
+  var at = 0, auto = false, autoTimer = null, barTimer = null;
+
+  /* ── grey step strips, built rather than hand-written ──────────────── */
+  function steps(el, from, to, n){
+    for (var i = 0; i < n; i++){
+      var v = Math.round(from + (to - from) * i / (n - 1));
+      var s = document.createElement("i");
+      s.style.background = "rgb(" + v + "," + v + "," + v + ")";
+      el.appendChild(s);
+    }
+  }
+  steps($("darkSteps"), 0, 34, 12);
+  steps($("lightSteps"), 221, 255, 12);
+
+  /* ── display facts ─────────────────────────────────────────────────── */
+  function readDisplay(){
+    $("dScreen").textContent = screen.width + " \u00d7 " + screen.height;
+    $("dCss").textContent = window.innerWidth + " \u00d7 " + window.innerHeight;
+    $("dDpr").textContent = (window.devicePixelRatio || 1).toFixed(2) + "x";
+    $("dDepth").textContent = (screen.colorDepth || 24) + "-bit";
+
+    var gamut = "sRGB";
+    if (window.matchMedia){
+      if (matchMedia("(color-gamut: rec2020)").matches) gamut = "Rec. 2020";
+      else if (matchMedia("(color-gamut: p3)").matches) gamut = "Display P3";
+    }
+    $("dGamut").textContent = gamut;
+
+    var hdr = "standard";
+    if (window.matchMedia && matchMedia("(dynamic-range: high)").matches) hdr = "high";
+    $("dHdr").textContent = hdr;
+
+    $("dOrient").textContent = window.innerWidth >= window.innerHeight ? "landscape" : "portrait";
+  }
+  readDisplay();
+  window.addEventListener("resize", readDisplay);
+
+  /* ── refresh rate ──────────────────────────────────────────────────── */
+  var samples = [], last = 0, settled = false;
+
+  function measure(now){
+    requestAnimationFrame(measure);
+    if (last){
+      var dt = now - last;
+      if (dt > 1 && dt < 200) samples.push(dt);
+      if (samples.length > 180) samples.shift();
+    }
+    last = now;
+
+    if (samples.length >= 40 && samples.length % 20 === 0){
+      var sorted = samples.slice().sort(function(a, b){ return a - b; });
+      var med = sorted[Math.floor(sorted.length / 2)];
+      var hz = 1000 / med;
+
+      /* snap to the usual panel rates so 59.7 reads as 60 */
+      var common = [24, 30, 48, 50, 60, 75, 90, 100, 120, 144, 165, 180, 200, 240, 360, 480];
+      var snapped = hz;
+      for (var i = 0; i < common.length; i++){
+        if (Math.abs(hz - common[i]) < Math.max(1.5, common[i] * 0.02)) { snapped = common[i]; break; }
+      }
+      $("hz").textContent = Math.round(snapped);
+
+      /* steadiness: how tightly frame times cluster around the median */
+      var within = samples.filter(function(d){ return Math.abs(d - med) < med * 0.15; }).length;
+      var pct = within / samples.length * 100;
+      $("steadyFill").style.width = pct.toFixed(0) + "%";
+      $("steadyVal").textContent = pct.toFixed(0) + "%";
+      $("vrrNote").textContent = pct > 92 ? "steady" : pct > 75 ? "some variance" : "unsteady";
+
+      if (!settled){
+        settled = true;
+        statusEl.classList.add("is-live");
+        statusText.textContent = "Reading this display";
+      }
+    }
+  }
+  requestAnimationFrame(measure);
+
+  /* ── full screen patterns ──────────────────────────────────────────── */
+  function apply(i){
+    at = (i + ORDER.length) % ORDER.length;
+    var p = ORDER[at];
+    fill.className = "full__fill";
+    fill.innerHTML = "";
+    fill.style.background = "";
+
+    if (p.fill === "gradient"){
+      fill.classList.add("full__fill--grad");
+    } else if (p.fill === "greys"){
+      fill.classList.add("full__fill--greys");
+      for (var k = 0; k < 16; k++){
+        var v = Math.round(255 * k / 15);
+        var s = document.createElement("i");
+        s.style.background = "rgb(" + v + "," + v + "," + v + ")";
+        fill.appendChild(s);
+      }
+    } else if (p.fill === "flash"){
+      fill.classList.add("full__fill--flash");
+    } else {
+      fill.style.background = p.fill;
+    }
+
+    $("fullName").textContent = p.name;
+    flashBar();
+  }
+
+  function flashBar(){
+    bar.classList.add("show");
+    clearTimeout(barTimer);
+    barTimer = setTimeout(function(){ bar.classList.remove("show"); }, 2600);
+  }
+
+  function enter(i){
+    apply(i);
+    full.hidden = false;
+    full.focus();
+    document.body.style.overflow = "hidden";
+    if (full.requestFullscreen) full.requestFullscreen().catch(function(){});
+    else if (full.webkitRequestFullscreen) full.webkitRequestFullscreen();
+    if (auto) startAuto();
+  }
+
+  function exit(){
+    full.hidden = true;
+    document.body.style.overflow = "";
+    stopAuto();
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){});
+    else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }
+
+  function startAuto(){
+    stopAuto();
+    autoTimer = setInterval(function(){ apply(at + 1); }, 3200);
+  }
+  function stopAuto(){ clearInterval(autoTimer); autoTimer = null; }
+
+  document.querySelectorAll(".sw").forEach(function(b, i){
+    b.addEventListener("click", function(){ enter(i); });
+  });
+
+  $("startAll").addEventListener("click", function(){ enter(0); });
+
+  $("cycle").addEventListener("click", function(){
+    auto = !auto;
+    this.textContent = "Auto-advance: " + (auto ? "on" : "off");
+    this.classList.toggle("on", auto);
+    if (!full.hidden){ auto ? startAuto() : stopAuto(); }
+  });
+
+  $("fullExit").addEventListener("click", function(e){ e.stopPropagation(); exit(); });
+
+  full.addEventListener("click", function(e){
+    if (e.target.closest(".full__bar")) return;
+    apply(at + 1);
+  });
+
+  full.addEventListener("mousemove", flashBar);
+  full.addEventListener("touchstart", flashBar, { passive: true });
+
+  document.addEventListener("keydown", function(e){
+    if (full.hidden) return;
+    if (e.key === "Escape"){ exit(); }
+    else if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " "){ e.preventDefault(); apply(at + 1); }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp"){ e.preventDefault(); apply(at - 1); }
+  });
+
+  /* leaving native full screen by any other route should close the overlay */
+  document.addEventListener("fullscreenchange", function(){
+    if (!document.fullscreenElement && !full.hidden) exit();
+  });
+
+  window.addEventListener("pagehide", stopAuto);
+})();
+
+</script>
+</body>
+</html>

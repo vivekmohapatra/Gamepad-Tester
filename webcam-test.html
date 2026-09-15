@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Webcam Test — Check Your Camera Online With Live Preview and Resolution</title>
+<meta name="description" content="Free online webcam test. See a live preview, check resolution and measured frame rate, switch between cameras, mirror the image and take a snapshot. Nothing is recorded or uploaded.">
+<link rel="canonical" href="https://gamepad-tester.vercel.app/webcam-test">
+<meta name="theme-color" content="#14181C">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hardware Test Bench">
+<meta property="og:title" content="Webcam Test — Check Your Camera Online With Live Preview and Resolution">
+<meta property="og:description" content="Free online webcam test. See a live preview, check resolution and measured frame rate, switch between cameras, mirror the image and take a snapshot. Nothing is recorded or uploaded.">
+<meta property="og:url" content="https://gamepad-tester.vercel.app/webcam-test">
+<meta property="og:image" content="https://gamepad-tester.vercel.app/og.png">
+<meta property="og:image:alt" content="A dark instrument panel lighting up as hardware is tested.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Webcam Test — Check Your Camera Online With Live Preview and Resolution">
+<meta name="twitter:description" content="Free online webcam test. See a live preview, check resolution and measured frame rate, switch between cameras, mirror the image and take a snapshot. Nothing is recorded or uploaded.">
+<meta name="twitter:image" content="https://gamepad-tester.vercel.app/og.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap"></noscript>
+<link rel="stylesheet" href="/assets/base.css">
+<style>
+.viewport{
+  position:relative;
+  aspect-ratio:16/9;
+  background:var(--panel-hi);
+  border:1px solid var(--rule);
+  border-radius:var(--r-chip);
+  overflow:hidden;
+}
+.viewport video{
+  display:block;width:100%;height:100%;
+  object-fit:cover;background:#0d1013;
+}
+.viewport video.mirrored{transform:scaleX(-1)}
+
+.grid3{position:absolute;inset:0;pointer-events:none}
+.grid3[hidden]{display:none}
+.grid3 i{position:absolute;background:rgba(233,236,239,.28)}
+.grid3 i:nth-child(1){left:33.333%;top:0;bottom:0;width:1px}
+.grid3 i:nth-child(2){left:66.666%;top:0;bottom:0;width:1px}
+.grid3 i:nth-child(3){top:33.333%;left:0;right:0;height:1px;background:rgba(62,208,196,.5)}
+.grid3 i:nth-child(4){top:66.666%;left:0;right:0;height:1px}
+
+.viewtools{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+@media (max-width:560px){ .viewtools{grid-template-columns:1fr} }
+
+.shot{
+  aspect-ratio:16/9;
+  background:var(--panel-hi);
+  border:1px solid var(--rule-soft);
+  border-radius:var(--r-chip);
+  overflow:hidden;
+  display:grid;place-items:center;
+}
+.shot img{display:block;width:100%;height:100%;object-fit:cover}
+.shot img[hidden]{display:none}
+.shot__empty{font-size:12.5px;color:var(--dim);padding:16px;text-align:center;line-height:1.5}
+
+.note__msg{font-size:12.5px;color:var(--muted);line-height:1.45}
+.note.ok .note__msg{color:#a8e8e0}
+.note.warn .note__msg{color:#ffa3a3}
+canvas[hidden]{display:none}
+
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://gamepad-tester.vercel.app/#website",
+      "url": "https://gamepad-tester.vercel.app/",
+      "name": "Hardware Test Bench",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://gamepad-tester.vercel.app/webcam-test#app",
+      "name": "Webcam Test",
+      "url": "https://gamepad-tester.vercel.app/webcam-test",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Windows, macOS, Linux, Android, iOS, ChromeOS",
+      "browserRequirements": "Modern browser, no plugins or downloads",
+      "description": "Browser tool that opens your camera so you can check the live preview, resolution, measured frame rate and capture a snapshot.",
+      "isPartOf": {
+        "@id": "https://gamepad-tester.vercel.app/#website"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://gamepad-tester.vercel.app/webcam-test#crumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://gamepad-tester.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Webcam",
+          "item": "https://gamepad-tester.vercel.app/webcam-test"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://gamepad-tester.vercel.app/webcam-test#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why is my webcam preview black?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In order of likelihood: a privacy shutter or sliding cover still closed, another application holding the camera, the camera disabled in system privacy settings, or the wrong device selected in the list. If the camera's indicator light is on but the picture is black, the shutter is the answer nine times out of ten."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Another app is using my camera. How do I release it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Most operating systems allow only one application to hold a camera at a time. Fully quit Zoom, Teams, Skype, Discord and OBS rather than just closing their windows, because several keep running in the system tray. On Windows, check Task Manager for background instances. A reboot clears any stubborn case in a few seconds."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is my resolution lower than the camera supports?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Browsers negotiate a stream rather than demanding the maximum. Bandwidth, lighting, USB port speed and the camera's own frame rate rules all push the negotiated resolution down. A 1080p webcam on a USB 2.0 hub shared with other devices will often settle at 720p. Plugging directly into the computer usually restores it."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I switch between front and rear cameras?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use the camera list, which fills in with real device names once permission is granted. On a phone, the front and rear cameras appear as separate entries. Some phones expose several rear lenses, including ultrawide and telephoto, so you may see more entries than you expected."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this record or upload my video?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The video stream is displayed directly in the page and never leaves your device. Snapshots are drawn locally and are only saved if you choose to download one. Pressing stop, or closing the tab, ends the stream and releases the camera."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is my frame rate low?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Light, almost always. In dim conditions a camera holds the shutter open longer for each frame, and a longer exposure means fewer frames per second. A 30 fps webcam routinely drops to 15 fps in a dark room. A window or a lamp in front of you fixes it instantly and improves the picture more than a more expensive camera would."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I test a virtual camera from OBS or Snap?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Virtual cameras appear in the device list alongside physical ones, so you can confirm your scene is being output correctly before joining a meeting. If a virtual camera is missing, its host application usually needs to be running and the virtual camera explicitly started."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "The image is upside down or the wrong way round.",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A mirrored preview is deliberate and normal. It feels natural to you, and video call apps do the same thing, while other participants see the unmirrored image. Toggle the mirror control to see what they see. A genuinely upside-down picture is a driver or mounting issue, common on laptops where the module is installed inverted. The manufacturer's camera utility usually has a flip setting."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which browsers support the webcam test?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Chrome, Edge, Firefox, Safari and Opera all support camera access on desktop, and Chrome and Safari support it on Android and iOS. Camera access requires a secure connection. A page served over plain HTTP cannot open a camera at all, on any browser."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does my camera work but look grainy and washed out?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "That is the sensor struggling with light rather than a fault. Small webcam sensors raise their gain in dim rooms, and raised gain means visible noise and flat colour. Light in front of you rather than behind you, and avoid sitting with a bright window at your back. Almost every bad webcam picture is a lighting problem."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "@id": "https://gamepad-tester.vercel.app/webcam-test#howto",
+      "name": "How to use the webcam test",
+      "totalTime": "PT2M",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Allow the camera",
+          "text": "Press Start camera and accept the browser prompt. Your camera's own indicator light should come on, which is a useful check in itself. If nothing happens, another application is probably holding the camera. Close Zoom, Teams, Discord and OBS and try again.",
+          "url": "https://gamepad-tester.vercel.app/webcam-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Check the picture and the numbers",
+          "text": "The panel reports the resolution and frame rate you are actually getting, which is often lower than the camera's advertised maximum. Frame rate drops in low light because the camera lengthens its exposure to compensate. If the number looks low, add light before you blame the camera.",
+          "url": "https://gamepad-tester.vercel.app/webcam-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Frame yourself, then snapshot",
+          "text": "Put your eyes roughly a third of the way down the frame and raise the camera to eye level. Both do more for how you look on a call than any camera upgrade. Take a snapshot to judge it properly. The mirrored preview is comfortable to look at but it is not what other people see.",
+          "url": "https://gamepad-tester.vercel.app/webcam-test#how-to"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C9C7L3L68W"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-C9C7L3L68W');
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8a4 4 0 0 1 3.9 3.1l1 4.4c.4 1.9-2 2.9-3 1.3l-1.6-2.5a1.5 1.5 0 0 0-1.3-.7H8.9a1.5 1.5 0 0 0-1.3.7l-1.5 2.5c-1 1.6-3.4.6-3-1.3l1-4.4A4 4 0 0 1 8 9z"/><path d="M8.2 11.5v2.2M7.1 12.6h2.2"/><circle cx="15.8" cy="12.6" r=".95" fill="currentColor" stroke="none"/></symbol><symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9.5" y="2.8" width="5" height="10.4" rx="2.5"/><path d="M5.6 11.2a6.4 6.4 0 0 0 12.8 0"/><path d="M12 17.6v3.6"/></symbol><symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 9.4h3l4.4-3.7a.8.8 0 0 1 1.3.6v11.4a.8.8 0 0 1-1.3.6l-4.4-3.7h-3a.9.9 0 0 1-.9-.9v-3.4a.9.9 0 0 1 .9-.9z"/><path d="M16.6 9.2a4 4 0 0 1 0 5.6M19.2 6.6a7.6 7.6 0 0 1 0 10.8"/></symbol><symbol id="i-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="6" width="19.2" height="12" rx="2"/><path d="M6 9.6h.01M9.6 9.6h.01M13.2 9.6h.01M16.8 9.6h.01M6 12.9h.01M9.6 12.9h.01M13.2 12.9h.01M16.8 12.9h.01M8.2 15.7h7.6"/></symbol><symbol id="i-mouse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6.4" y="2.5" width="11.2" height="19" rx="5.6"/><path d="M12 6.4v3.8"/></symbol><symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.6 8.6h3.2l1.5-2.6h9.4l1.5 2.6h3.2a.9.9 0 0 1 .9.9v8a.9.9 0 0 1-.9.9H2.6a.9.9 0 0 1-.9-.9v-8a.9.9 0 0 1 .9-.9z"/><circle cx="12" cy="13.4" r="3.4"/></symbol><symbol id="i-display" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="4" width="19.2" height="13" rx="2"/><path d="M9 21.2h6M12 17.2v4"/></symbol></defs></svg>
+
+<header class="masthead">
+  <div class="wrap grid">
+    <div class="c7">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z" fill="#c9cfd6"/>
+          <circle cx="21.5" cy="16.5" r="1.9" fill="#ff7a18"/>
+          <rect x="8" y="15.4" width="6" height="2.2" rx="1.1" fill="#14181c"/>
+          <rect x="9.9" y="13.5" width="2.2" height="6" rx="1.1" fill="#14181c"/>
+        </svg>
+        <span class="brandname">Hardware Test Bench</span>
+      </a>
+      <h1>Webcam test</h1>
+      <p class="tagline">See exactly what your camera sends, at what resolution and how many frames a second, before you join the call.</p>
+    </div>
+    <div class="c5 status-wrap">
+      <p class="status" id="status" role="status" aria-live="polite">
+        <span class="status__dot" aria-hidden="true"></span>
+        <span id="statusText">Camera off</span>
+      </p>
+    </div>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Hardware tests">
+  <div class="wrap rail__inner">
+      <a href="/"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><span>Gamepad</span></a>
+      <a href="/microphone-test"><svg aria-hidden="true"><use href="#i-mic"></use></svg><span>Microphone</span></a>
+      <a href="/speaker-test"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><span>Speakers</span></a>
+      <a href="/keyboard-test"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><span>Keyboard</span></a>
+      <a href="/mouse-test"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><span>Mouse</span></a>
+      <a href="/webcam-test" aria-current="page"><svg aria-hidden="true"><use href="#i-camera"></use></svg><span>Webcam</span></a>
+      <a href="/screen-test"><svg aria-hidden="true"><use href="#i-display"></use></svg><span>Screen</span></a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- preview -->
+    <section class="panel stage c8" aria-labelledby="h-view">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-view">Preview</h2>
+        <span class="panel__note" id="liveNote">camera off</span>
+      </div>
+
+      <div class="viewport" id="viewport">
+        <video id="video" playsinline autoplay muted></video>
+        <div class="grid3" id="grid3" hidden aria-hidden="true">
+          <i></i><i></i><i></i><i></i>
+        </div>
+
+        <div class="prompt" id="prompt">
+          <div class="prompt__ring" aria-hidden="true"></div>
+          <h2>Your camera is off</h2>
+          <p>Nothing is captured until you start it. The video never leaves this page.</p>
+          <button class="btn btn--go" id="startTop">Start camera</button>
+        </div>
+      </div>
+
+      <div class="viewtools">
+        <button class="btn" id="mirror">Mirror: on</button>
+        <button class="btn" id="guides">Framing guides</button>
+        <button class="btn" id="snap" disabled>Take snapshot</button>
+      </div>
+    </section>
+
+    <!-- device -->
+    <section class="panel c4" aria-labelledby="h-dev">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-dev">Camera</h2>
+        <span class="panel__note" id="devNote">not started</span>
+      </div>
+
+      <div class="ctrl">
+        <label for="devices">Device</label>
+        <select id="devices" disabled>
+          <option>Start the camera to list devices</option>
+        </select>
+      </div>
+
+      <div class="ctrl">
+        <label for="quality">Requested quality</label>
+        <select id="quality">
+          <option value="best">Highest the camera offers</option>
+          <option value="1080">1920 &times; 1080</option>
+          <option value="720" selected>1280 &times; 720</option>
+          <option value="480">640 &times; 480</option>
+        </select>
+      </div>
+
+      <dl class="spec">
+        <div><dt>Actual resolution</dt><dd id="dRes">—</dd></div>
+        <div><dt>Reported rate</dt><dd id="dFps">—</dd></div>
+        <div><dt>Measured rate</dt><dd id="dReal">—</dd></div>
+        <div><dt>Aspect</dt><dd id="dAspect">—</dd></div>
+        <div><dt>Facing</dt><dd id="dFacing">—</dd></div>
+      </dl>
+
+      <div class="btnrow">
+        <button class="btn btn--go" id="start">Start camera</button>
+        <button class="btn" id="stop" disabled>Stop</button>
+      </div>
+    </section>
+
+    <!-- picture -->
+    <section class="panel c4" aria-labelledby="h-pic">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-pic">Picture check</h2>
+        <span class="panel__note" id="brightNote">—</span>
+      </div>
+
+      <div class="meters">
+        <div class="meter">
+          <b>Brightness</b>
+          <div class="meter__track"><div class="meter__fill meter__fill--analog" id="briFill"></div></div>
+          <span class="meter__val" id="briVal">—</span>
+        </div>
+        <div class="meter">
+          <b>Contrast</b>
+          <div class="meter__track"><div class="meter__fill meter__fill--analog" id="conFill"></div></div>
+          <span class="meter__val" id="conVal">—</span>
+        </div>
+      </div>
+
+      <div class="note" id="picBox" style="margin-top:18px">
+        <p class="note__msg" id="picMsg">Start the camera and this reads the picture itself, not
+        what the camera claims. Almost every bad webcam image is a lighting problem.</p>
+      </div>
+
+      <canvas id="sample" width="64" height="36" hidden></canvas>
+    </section>
+
+    <!-- snapshot -->
+    <section class="panel c4" aria-labelledby="h-snap">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-snap">Snapshot</h2>
+        <span class="panel__note" id="shotNote">none yet</span>
+      </div>
+
+      <div class="shot" id="shotWrap">
+        <img id="shot" alt="Your most recent snapshot" hidden>
+        <p class="shot__empty" id="shotEmpty">The preview is mirrored because it feels natural.
+        A snapshot is not, so this is what other people actually see.</p>
+      </div>
+
+      <div class="btnrow" style="margin-top:16px">
+        <button class="btn btn--go" id="snap2" disabled>Take snapshot</button>
+        <button class="btn" id="dl" disabled>Save</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="info grid">
+    <article class="c4">
+      <h2>Light in front, not behind</h2>
+      <p>A small webcam sensor raises its gain in a dim room, and raised gain means visible noise
+      and flat, washed-out colour. A lamp or a window facing you fixes more than a more expensive
+      camera would. A bright window behind you turns you into a silhouette.</p>
+    </article>
+    <article class="c4">
+      <h2>Why 1080p often arrives as 720p</h2>
+      <p>The browser negotiates a stream rather than demanding a maximum, and lighting, USB
+      bandwidth and the camera's own frame rate rules all push it down. A 1080p webcam on a shared
+      USB 2.0 hub routinely settles at 720p. Plugging straight into the machine usually restores it.</p>
+    </article>
+    <article class="c4">
+      <h2>Camera height matters more than megapixels</h2>
+      <p>Raise the camera to eye level and put your eyes roughly a third of the way down the frame.
+      A stack of books under a laptop does more for how you come across on a call than any hardware
+      upgrade on the market.</p>
+    </article>
+  </div>
+
+
+  <!-- how to use -->
+  <section class="section" id="how-to" aria-labelledby="h-how">
+    <div class="section__head">
+      <h2 id="h-how">How to use the webcam test</h2>
+      <p>Two minutes here saves the first two minutes of a meeting. Check the picture, the resolution and the framing before anyone is watching.</p>
+    </div>
+    <ol class="steps grid">
+      <li class="step c4">
+        <h3>Allow the camera</h3>
+        <p>Press <em>Start camera</em> and accept the browser prompt. Your camera's own indicator light should come on, which is a useful check in itself.</p>
+        <p>If nothing happens, another application is probably holding the camera. Close Zoom, Teams, Discord and OBS and try again.</p>
+      </li>
+      <li class="step c4">
+        <h3>Check the picture and the numbers</h3>
+        <p>The panel reports the resolution and frame rate you are actually getting, which is often lower than the camera's advertised maximum.</p>
+        <p>Frame rate drops in low light because the camera lengthens its exposure to compensate. If the number looks low, add light before you blame the camera.</p>
+      </li>
+      <li class="step c4">
+        <h3>Frame yourself, then snapshot</h3>
+        <p>Put your eyes roughly a third of the way down the frame and raise the camera to eye level. Both do more for how you look on a call than any camera upgrade.</p>
+        <p>Take a snapshot to judge it properly. The mirrored preview is comfortable to look at but it is not what other people see.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- faq -->
+  <section class="section" id="faq" aria-labelledby="h-faq">
+    <div class="section__head">
+      <h2 id="h-faq">Questions people ask</h2>
+      <p>Black previews, cameras in use elsewhere, and why your 1080p webcam sends 720p.</p>
+    </div>
+    <div class="faq">
+    <details open>
+      <summary>Why is my webcam preview black?</summary>
+      <div class="faq__a">
+        <p>In order of likelihood: a privacy shutter or sliding cover still closed, another application holding the camera, the camera disabled in system privacy settings, or the wrong device selected in the list.</p>
+        <p>If the camera's indicator light is on but the picture is black, the shutter is the answer nine times out of ten.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Another app is using my camera. How do I release it?</summary>
+      <div class="faq__a">
+        <p>Most operating systems allow only one application to hold a camera at a time. Fully quit Zoom, Teams, Skype, Discord and OBS rather than just closing their windows, because several keep running in the system tray.</p>
+        <p>On Windows, check Task Manager for background instances. A reboot clears any stubborn case in a few seconds.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why is my resolution lower than the camera supports?</summary>
+      <div class="faq__a">
+        <p>Browsers negotiate a stream rather than demanding the maximum. Bandwidth, lighting, USB port speed and the camera's own frame rate rules all push the negotiated resolution down.</p>
+        <p>A 1080p webcam on a USB 2.0 hub shared with other devices will often settle at 720p. Plugging directly into the computer usually restores it.</p>
+      </div>
+    </details>
+    <details>
+      <summary>How do I switch between front and rear cameras?</summary>
+      <div class="faq__a">
+        <p>Use the camera list, which fills in with real device names once permission is granted. On a phone, the front and rear cameras appear as separate entries.</p>
+        <p>Some phones expose several rear lenses, including ultrawide and telephoto, so you may see more entries than you expected.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Does this record or upload my video?</summary>
+      <div class="faq__a">
+        <p>No. The video stream is displayed directly in the page and never leaves your device. Snapshots are drawn locally and are only saved if you choose to download one.</p>
+        <p>Pressing stop, or closing the tab, ends the stream and releases the camera.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why is my frame rate low?</summary>
+      <div class="faq__a">
+        <p>Light, almost always. In dim conditions a camera holds the shutter open longer for each frame, and a longer exposure means fewer frames per second. A 30 fps webcam routinely drops to 15 fps in a dark room.</p>
+        <p>A window or a lamp in front of you fixes it instantly and improves the picture more than a more expensive camera would.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can I test a virtual camera from OBS or Snap?</summary>
+      <div class="faq__a">
+        <p>Yes. Virtual cameras appear in the device list alongside physical ones, so you can confirm your scene is being output correctly before joining a meeting.</p>
+        <p>If a virtual camera is missing, its host application usually needs to be running and the virtual camera explicitly started.</p>
+      </div>
+    </details>
+    <details>
+      <summary>The image is upside down or the wrong way round.</summary>
+      <div class="faq__a">
+        <p>A mirrored preview is deliberate and normal. It feels natural to you, and video call apps do the same thing, while other participants see the unmirrored image. Toggle the mirror control to see what they see.</p>
+        <p>A genuinely upside-down picture is a driver or mounting issue, common on laptops where the module is installed inverted. The manufacturer's camera utility usually has a flip setting.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Which browsers support the webcam test?</summary>
+      <div class="faq__a">
+        <p>Chrome, Edge, Firefox, Safari and Opera all support camera access on desktop, and Chrome and Safari support it on Android and iOS.</p>
+        <p>Camera access requires a secure connection. A page served over plain HTTP cannot open a camera at all, on any browser.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Does my camera work but look grainy and washed out?</summary>
+      <div class="faq__a">
+        <p>That is the sensor struggling with light rather than a fault. Small webcam sensors raise their gain in dim rooms, and raised gain means visible noise and flat colour.</p>
+        <p>Light in front of you rather than behind you, and avoid sitting with a bright window at your back. Almost every bad webcam picture is a lighting problem.</p>
+      </div>
+    </details>
+    </div>
+  </section>
+
+  <!-- other tools -->
+  <section class="section" id="more" aria-labelledby="h-more">
+    <div class="section__head">
+      <h2 id="h-more">Test the rest of your setup</h2>
+      <p>Every tool runs in this tab, reads your hardware directly through the browser, and stores nothing.</p>
+    </div>
+    <div class="tools">
+    <a class="tool" href="/">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><b>Gamepad</b></span>
+      <p>Check buttons, analog sticks, triggers, the D-pad and rumble, and measure stick drift.</p>
+    </a>
+    <a class="tool" href="/microphone-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-mic"></use></svg><b>Microphone</b></span>
+      <p>Live waveform, level meter in dBFS, noise floor reading, and instant record and playback.</p>
+    </a>
+    <a class="tool" href="/speaker-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><b>Speakers</b></span>
+      <p>Left and right channel checks, a tone generator, and a 20 Hz to 20 kHz hearing sweep.</p>
+    </a>
+    <a class="tool" href="/keyboard-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><b>Keyboard</b></span>
+      <p>Light up a full layout key by key, read live key codes, and test N-key rollover.</p>
+    </a>
+    <a class="tool" href="/mouse-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><b>Mouse</b></span>
+      <p>Buttons, scroll wheel, movement trace, polling rate in Hz, and a double-click chatter check.</p>
+    </a>
+    <a class="tool" href="/screen-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-display"></use></svg><b>Screen</b></span>
+      <p>Dead pixel hunt, backlight bleed check, gradient banding, and a measured refresh rate.</p>
+    </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav class="foot-links" aria-label="All tests">
+      <a href="/">Gamepad test</a>
+      <a href="/">Gamepad</a>
+      <a href="/microphone-test">Microphone</a>
+      <a href="/speaker-test">Speakers</a>
+      <a href="/keyboard-test">Keyboard</a>
+      <a href="/mouse-test">Mouse</a>
+      <a href="/screen-test">Screen</a>
+    </nav>
+    <div class="grid">
+      <p class="sig c6"><b>Melted Code</b> — browser hardware diagnostics</p>
+      <p class="foot-note c6">Runs entirely on your device. Nothing you press, say or show is recorded or uploaded.</p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  "use strict";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var statusEl = $("status"), statusText = $("statusText"), prompt = $("prompt");
+  var video = $("video"), devSel = $("devices");
+  var sample = $("sample"), sctx = sample.getContext("2d", { willReadFrequently: true });
+
+  var stream = null, raf = null, shotUrl = null;
+  var mirrored = true, guides = false;
+  var lastT = 0, fpsCount = 0, fpsMark = 0, lastFrames = -1, analyseMark = 0;
+
+  video.classList.add("mirrored");
+
+  /* ── devices ───────────────────────────────────────────────────────── */
+  function listDevices(){
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+    navigator.mediaDevices.enumerateDevices().then(function(all){
+      var cams = all.filter(function(d){ return d.kind === "videoinput"; });
+      if (!cams.length) return;
+      var keep = devSel.value;
+      devSel.innerHTML = "";
+      cams.forEach(function(d, i){
+        var o = document.createElement("option");
+        o.value = d.deviceId;
+        o.textContent = d.label || ("Camera " + (i + 1));
+        devSel.appendChild(o);
+      });
+      if (keep) devSel.value = keep;
+      devSel.disabled = false;
+      $("devNote").textContent = cams.length + (cams.length === 1 ? " camera" : " cameras");
+    }).catch(function(){});
+  }
+
+  if (navigator.mediaDevices && navigator.mediaDevices.addEventListener){
+    navigator.mediaDevices.addEventListener("devicechange", listDevices);
+  }
+
+  /* ── start / stop ──────────────────────────────────────────────────── */
+  function constraints(){
+    var q = $("quality").value;
+    var v = {};
+    if (q === "1080"){ v.width = { ideal: 1920 }; v.height = { ideal: 1080 }; }
+    else if (q === "720"){ v.width = { ideal: 1280 }; v.height = { ideal: 720 }; }
+    else if (q === "480"){ v.width = { ideal: 640 }; v.height = { ideal: 480 }; }
+    else { v.width = { ideal: 3840 }; v.height = { ideal: 2160 }; }
+    if (devSel.value && !devSel.disabled) v.deviceId = { exact: devSel.value };
+    return { video: v, audio: false };
+  }
+
+  function start(){
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      fail("This browser cannot open a camera. Try Chrome, Edge, Firefox or Safari.");
+      return;
+    }
+    $("start").disabled = true;
+    statusText.textContent = "Waiting for permission";
+
+    navigator.mediaDevices.getUserMedia(constraints()).then(open).catch(function(err){
+      $("start").disabled = false;
+      if (err && (err.name === "NotAllowedError" || err.name === "SecurityError")){
+        fail("Permission was refused. Open the padlock in the address bar, allow the camera, then reload.");
+      } else if (err && err.name === "NotFoundError"){
+        fail("No camera was found. Check it is connected and enabled in your system privacy settings.");
+      } else if (err && err.name === "NotReadableError"){
+        fail("Another application is holding the camera. Fully quit Zoom, Teams, Discord or OBS and try again.");
+      } else if (err && err.name === "OverconstrainedError"){
+        fail("This camera cannot provide the resolution you asked for. Choose a lower one and try again.");
+      } else {
+        fail("The camera could not be opened.");
+      }
+    });
+  }
+
+  function fail(msg){
+    statusEl.classList.remove("is-live");
+    statusEl.classList.add("is-warn");
+    statusText.textContent = "Camera unavailable";
+    prompt.hidden = false;
+    prompt.querySelector("h2").textContent = "Could not start";
+    prompt.querySelector("p").textContent = msg;
+  }
+
+  function open(s){
+    stream = s;
+    video.srcObject = s;
+    var track = s.getVideoTracks()[0];
+    var set = track.getSettings ? track.getSettings() : {};
+
+    $("dFps").textContent = set.frameRate ? Math.round(set.frameRate) + " fps" : "not reported";
+    $("dFacing").textContent = set.facingMode || "not reported";
+
+    statusEl.classList.remove("is-warn");
+    statusEl.classList.add("is-live");
+    statusText.textContent = "Camera live";
+    $("liveNote").textContent = "live";
+    prompt.hidden = true;
+    $("start").disabled = true;
+    $("stop").disabled = false;
+    $("snap").disabled = $("snap2").disabled = false;
+
+    video.onloadedmetadata = function(){
+      video.play().catch(function(){});
+      readSize();
+    };
+    track.addEventListener("ended", stop);
+    listDevices();
+
+    fpsMark = performance.now();
+    lastFrames = -1;
+    if (!raf) raf = requestAnimationFrame(loop);
+  }
+
+  function readSize(){
+    var w = video.videoWidth, h = video.videoHeight;
+    if (!w || !h) return;
+    $("dRes").textContent = w + " \u00d7 " + h;
+    var r = w / h;
+    $("dAspect").textContent = Math.abs(r - 16 / 9) < 0.03 ? "16:9"
+      : Math.abs(r - 4 / 3) < 0.03 ? "4:3"
+      : Math.abs(r - 3 / 2) < 0.03 ? "3:2"
+      : r.toFixed(2) + ":1";
+    $("viewport").style.aspectRatio = w + " / " + h;
+  }
+
+  function stop(){
+    if (raf){ cancelAnimationFrame(raf); raf = null; }
+    if (stream){ stream.getTracks().forEach(function(t){ t.stop(); }); stream = null; }
+    video.srcObject = null;
+
+    statusEl.classList.remove("is-live", "is-warn");
+    statusText.textContent = "Camera off";
+    $("liveNote").textContent = "camera off";
+    prompt.hidden = false;
+    prompt.querySelector("h2").textContent = "Your camera is off";
+    prompt.querySelector("p").textContent = "Nothing is captured until you start it. The video never leaves this page.";
+    $("start").disabled = false;
+    $("stop").disabled = true;
+    $("snap").disabled = $("snap2").disabled = true;
+    ["dRes","dFps","dReal","dAspect","dFacing"].forEach(function(id){ $(id).textContent = "—"; });
+    $("briFill").style.width = $("conFill").style.width = "0%";
+    $("briVal").textContent = $("conVal").textContent = "—";
+    $("brightNote").textContent = "—";
+  }
+
+  $("start").addEventListener("click", start);
+  $("startTop").addEventListener("click", start);
+  $("stop").addEventListener("click", stop);
+  devSel.addEventListener("change", function(){ if (stream){ stop(); start(); } });
+  $("quality").addEventListener("change", function(){ if (stream){ stop(); start(); } });
+
+  /* ── view tools ────────────────────────────────────────────────────── */
+  $("mirror").addEventListener("click", function(){
+    mirrored = !mirrored;
+    video.classList.toggle("mirrored", mirrored);
+    this.textContent = "Mirror: " + (mirrored ? "on" : "off");
+    this.classList.toggle("on", !mirrored);
+  });
+
+  $("guides").addEventListener("click", function(){
+    guides = !guides;
+    $("grid3").hidden = !guides;
+    this.classList.toggle("on", guides);
+  });
+
+  /* ── snapshot ──────────────────────────────────────────────────────── */
+  function snapshot(){
+    if (!stream || !video.videoWidth) return;
+    var c = document.createElement("canvas");
+    c.width = video.videoWidth;
+    c.height = video.videoHeight;
+    c.getContext("2d").drawImage(video, 0, 0);
+    c.toBlob(function(blob){
+      if (!blob) return;
+      if (shotUrl) URL.revokeObjectURL(shotUrl);
+      shotUrl = URL.createObjectURL(blob);
+      $("shot").src = shotUrl;
+      $("shot").hidden = false;
+      $("shotEmpty").hidden = true;
+      $("dl").disabled = false;
+      $("shotNote").textContent = video.videoWidth + " \u00d7 " + video.videoHeight;
+    }, "image/png");
+  }
+
+  $("snap").addEventListener("click", snapshot);
+  $("snap2").addEventListener("click", snapshot);
+  $("dl").addEventListener("click", function(){
+    if (!shotUrl) return;
+    var a = document.createElement("a");
+    a.href = shotUrl;
+    a.download = "webcam-test.png";
+    a.click();
+  });
+
+  /* ── measure ───────────────────────────────────────────────────────── */
+  function loop(now){
+    raf = requestAnimationFrame(loop);
+    if (!stream || !video.videoWidth) return;
+
+    if ($("dRes").textContent === "—") readSize();
+
+    /* real frame rate: count only frames the camera actually delivered */
+    var frames = null;
+    if (typeof video.webkitDecodedFrameCount === "number") frames = video.webkitDecodedFrameCount;
+    else if (video.getVideoPlaybackQuality) frames = video.getVideoPlaybackQuality().totalVideoFrames;
+
+    if (frames !== null){
+      if (lastFrames < 0){ lastFrames = frames; fpsMark = now; }
+      else if (now - fpsMark >= 1000){
+        var fps = (frames - lastFrames) * 1000 / (now - fpsMark);
+        $("dReal").textContent = fps.toFixed(1) + " fps";
+        lastFrames = frames; fpsMark = now;
+      }
+    } else {
+      $("dReal").textContent = "not measurable here";
+    }
+
+    /* picture analysis, four times a second is plenty */
+    if (now - analyseMark < 250) return;
+    analyseMark = now;
+
+    sctx.drawImage(video, 0, 0, sample.width, sample.height);
+    var d;
+    try { d = sctx.getImageData(0, 0, sample.width, sample.height).data; }
+    catch (e){ return; }
+
+    var i, sum = 0, sq = 0, n = 0;
+    for (i = 0; i < d.length; i += 4){
+      var l = 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+      sum += l; sq += l * l; n++;
+    }
+    var mean = sum / n;
+    var sd = Math.sqrt(Math.max(0, sq / n - mean * mean));
+
+    var bri = mean / 255 * 100;
+    var con = Math.min(100, sd / 80 * 100);
+    $("briFill").style.width = bri.toFixed(0) + "%";
+    $("conFill").style.width = con.toFixed(0) + "%";
+    $("briVal").textContent = bri.toFixed(0) + "%";
+    $("conVal").textContent = con.toFixed(0) + "%";
+
+    var box = $("picBox");
+    if (bri < 18){
+      box.className = "note warn";
+      $("brightNote").textContent = "too dark";
+      $("picMsg").textContent = "Very dark. The camera is lengthening its exposure to cope, which costs you frame rate and adds noise. Put a light in front of you.";
+    } else if (bri > 78){
+      box.className = "note warn";
+      $("brightNote").textContent = "blown out";
+      $("picMsg").textContent = "Overexposed. Something bright is behind or beside you, and the camera is losing detail in your face to compensate.";
+    } else if (con < 12){
+      box.className = "note";
+      $("brightNote").textContent = "flat";
+      $("picMsg").textContent = "The picture is very flat. That usually means even, dull light, or a lens that needs a wipe.";
+    } else {
+      box.className = "note ok";
+      $("brightNote").textContent = "looks good";
+      $("picMsg").textContent = "Exposure and contrast both look healthy.";
+    }
+  }
+
+  window.addEventListener("pagehide", stop);
+})();
+
+</script>
+</body>
+</html>

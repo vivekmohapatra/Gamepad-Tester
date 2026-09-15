@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Keyboard Tester — Check Every Key, Ghosting and Rollover Online</title>
+<meta name="description" content="Free online keyboard test. Press keys and watch them light up on a full layout, see key codes live, count how many keys register at once to check N-key rollover, and catch keys that repeat or fail.">
+<link rel="canonical" href="https://gamepad-tester.vercel.app/keyboard-test">
+<meta name="theme-color" content="#14181C">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hardware Test Bench">
+<meta property="og:title" content="Keyboard Tester — Check Every Key, Ghosting and Rollover Online">
+<meta property="og:description" content="Free online keyboard test. Press keys and watch them light up on a full layout, see key codes live, count how many keys register at once to check N-key rollover, and catch keys that repeat or fail.">
+<meta property="og:url" content="https://gamepad-tester.vercel.app/keyboard-test">
+<meta property="og:image" content="https://gamepad-tester.vercel.app/og.png">
+<meta property="og:image:alt" content="A dark instrument panel lighting up as hardware is tested.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Keyboard Tester — Check Every Key, Ghosting and Rollover Online">
+<meta name="twitter:description" content="Free online keyboard test. Press keys and watch them light up on a full layout, see key codes live, count how many keys register at once to check N-key rollover, and catch keys that repeat or fail.">
+<meta name="twitter:image" content="https://gamepad-tester.vercel.app/og.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap"></noscript>
+<link rel="stylesheet" href="/assets/base.css">
+<style>
+.panel__head:has(.switch--inline){align-items:center}
+.boardscroll{overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.board{
+  display:flex;gap:16px;align-items:flex-start;
+  min-width:920px;padding:4px;
+  border-radius:var(--r-chip);
+}
+.board:focus-visible{outline:2px solid var(--analog);outline-offset:4px}
+.block{display:grid;gap:5px}
+.block--main{flex:1 1 auto;min-width:0}
+.block--nav{flex:0 0 118px}
+.block--num{flex:0 0 158px}
+
+.krow{display:flex;gap:5px}
+.krow--gap{margin-bottom:9px}
+
+.k{
+  flex:var(--w,1) 1 0;
+  min-width:0;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 4px;
+  background:var(--panel-hi);
+  border:1px solid var(--rule);
+  border-bottom-width:2px;
+  border-radius:4px;
+  font-size:11px;font-weight:500;
+  color:var(--muted);
+  text-align:center;line-height:1.15;
+  overflow:hidden;
+  transition:background .04s,border-color .04s,color .04s;
+  user-select:none;
+}
+.k--blank{background:transparent;border-color:transparent;pointer-events:none}
+.k--wide{font-size:10.5px}
+
+.k.tested{
+  border-color:rgba(62,208,196,.5);
+  color:var(--analog);
+  background:rgba(62,208,196,.09);
+}
+.k.down{
+  background:var(--signal);
+  border-color:var(--signal);
+  color:#14181c;
+  font-weight:600;
+  transform:translateY(1px);
+  border-bottom-width:1px;
+  box-shadow:0 0 12px rgba(255,122,24,.4);
+}
+.k.chatter{border-color:var(--alert);color:#ffa3a3}
+
+.bigkey{margin-bottom:14px}
+.bigkey strong{
+  font-family:var(--display);
+  font-size:38px;font-weight:600;
+  font-variation-settings:"wdth" 88;
+  letter-spacing:-.03em;line-height:1;
+  word-break:break-word;
+}
+
+.switch{display:flex;gap:9px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+.switch--inline{flex:none;font-size:12.5px}
+.switch input{
+  appearance:none;-webkit-appearance:none;
+  width:15px;height:15px;flex:none;
+  border:1px solid var(--rule);border-radius:3px;
+  background:var(--panel-hi);cursor:pointer;
+  transition:background .15s,border-color .15s;
+}
+.switch input:checked{background:var(--signal);border-color:var(--signal)}
+.switch input:checked::after{
+  content:"";display:block;
+  width:4px;height:8px;margin:1px 0 0 4px;
+  border:solid #14181c;border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+}
+
+.stage__note{
+  font-size:12.5px;color:var(--muted);
+  padding:12px 4px 2px;border-top:1px solid var(--rule-soft);margin-top:14px;
+}
+.stage__note kbd{
+  font-family:var(--mono);font-size:11.5px;
+  background:var(--panel-hi);border:1px solid var(--rule);
+  border-radius:var(--r-chip);padding:1px 5px;color:var(--text);
+}
+.note__msg{font-size:12.5px;color:var(--muted);line-height:1.45}
+.note.ok .note__msg{color:#a8e8e0}
+.note.warn .note__msg{color:#ffa3a3}
+
+@media (max-width:720px){
+  .k{height:32px;font-size:10px}
+  .panel__head .switch--inline span{display:none}
+}
+
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://gamepad-tester.vercel.app/#website",
+      "url": "https://gamepad-tester.vercel.app/",
+      "name": "Hardware Test Bench",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://gamepad-tester.vercel.app/keyboard-test#app",
+      "name": "Keyboard Tester",
+      "url": "https://gamepad-tester.vercel.app/keyboard-test",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Windows, macOS, Linux, Android, iOS, ChromeOS",
+      "browserRequirements": "Modern browser, no plugins or downloads",
+      "description": "Browser tool that reads keyboard events so you can test every key, read key codes, and measure how many keys register simultaneously.",
+      "isPartOf": {
+        "@id": "https://gamepad-tester.vercel.app/#website"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://gamepad-tester.vercel.app/keyboard-test#crumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://gamepad-tester.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Keyboard",
+          "item": "https://gamepad-tester.vercel.app/keyboard-test"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://gamepad-tester.vercel.app/keyboard-test#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why is one of my keys not registering?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "If a key never lights here, the signal is not reaching the browser at all. Try it in a text editor to confirm, then unplug and reconnect the keyboard, try a different USB port, and test on another computer if you can. A single dead key on a mechanical keyboard is often a failed switch, which is replaceable. On a membrane or laptop keyboard it usually means debris under the key or a damaged membrane sheet, and a liquid spill is the usual cause."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is key ghosting and N-key rollover?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ghosting is when a keyboard stops registering additional keys because of how its switches are wired into a shared matrix. Press three keys in the wrong arrangement and the third simply never arrives. N-key rollover means every key is read independently, so any number can register at once. Hold several keys here and watch the counter to see which kind you own. Six is a common limit on USB keyboards and is plenty for most use."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I test for a chattering or double-typing key?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Chatter is a worn switch that sends two presses from one push. Press the suspect key slowly and deliberately about twenty times and watch the press counter for that key. If the count climbs faster than you pressed, the switch is bouncing. On a hot-swappable keyboard you can replace the switch; otherwise some keyboards let you raise the debounce time in their configuration software."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do browser shortcuts still fire sometimes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Capture mode stops most keys reaching the browser, but a handful are reserved by the operating system and can never be intercepted by a web page. That is a security boundary rather than a limitation of this test. Ctrl+W, Alt+Tab, Ctrl+Alt+Delete, Command+Q and the Windows key are the usual ones. Test those in your own operating system rather than in a browser tab."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why don't Fn, media keys or the power button show up?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Fn key is handled inside the keyboard itself and never sends a key code to the computer, so no software on any platform can see it. It is not broken. Media keys and brightness keys often go straight to the operating system too. If volume actually changes when you press them, they work, even though nothing lights up here."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I test a laptop keyboard?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, and it works the same way. The layout drawn here is a full-size one, so a laptop without a number pad will simply leave that block unmarked, which is expected. If several neighbouring keys are dead on a laptop, suspect the ribbon cable or a spill rather than individual switches."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What do code, key and keyCode mean?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "code is the physical position on the keyboard and does not change with your language layout. key is the character that position currently produces, which does. So on a French AZERTY layout the key next to Tab reports a code of KeyQ but a key of 'a'. keyCode is an older number that browsers still report for compatibility."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I test a keyboard on a phone or tablet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Only a physical one. On-screen touch keyboards send text rather than key events, so most of what this page measures does not apply to them. A Bluetooth or USB keyboard attached to a phone or tablet does work, and reports the same codes it would on a desktop."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the test record what I type?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Key events are read, drawn on screen and discarded. Nothing is sent anywhere, nothing is stored, and reloading the page clears every mark. For obvious reasons, do not type passwords into any keyboard test, here or anywhere else. Test with ordinary letters."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "My key repeats on its own. What causes that?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A key that fires continuously without being held usually has something physically holding the switch down: debris, a sticky spill, or a keycap fouling its housing. Pull the cap and check underneath. If nothing is stuck, the switch has failed closed and needs replacing. In the meantime most operating systems let you remap the key to nothing so it stops interrupting you."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "@id": "https://gamepad-tester.vercel.app/keyboard-test#howto",
+      "name": "How to use the keyboard tester",
+      "totalTime": "PT2M",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Click the layout, then start pressing",
+          "text": "Click once anywhere on the keyboard drawing so the page has focus. Keys light orange as you hold them and stay marked teal once proven. Work in rows rather than hunting: top row across, then each row down. That way you notice the gap rather than forgetting which keys you already did.",
+          "url": "https://gamepad-tester.vercel.app/keyboard-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Watch the live event readout",
+          "text": "Every press shows its physical code, the key character it produces, and whether the event is a repeat. That distinction matters: a key can be physically fine but mapped wrong by your layout. If a key produces the wrong character, the fault is your keyboard layout setting rather than the hardware.",
+          "url": "https://gamepad-tester.vercel.app/keyboard-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Hold several keys to test rollover",
+          "text": "Hold three or four keys together and watch the simultaneous counter. Cheap membrane keyboards stop registering after two or three keys in the same area, which is called ghosting. Gaming keyboards with N-key rollover keep counting well past six. Try WASD plus space plus shift, the combination that actually matters in games.",
+          "url": "https://gamepad-tester.vercel.app/keyboard-test#how-to"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C9C7L3L68W"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-C9C7L3L68W');
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8a4 4 0 0 1 3.9 3.1l1 4.4c.4 1.9-2 2.9-3 1.3l-1.6-2.5a1.5 1.5 0 0 0-1.3-.7H8.9a1.5 1.5 0 0 0-1.3.7l-1.5 2.5c-1 1.6-3.4.6-3-1.3l1-4.4A4 4 0 0 1 8 9z"/><path d="M8.2 11.5v2.2M7.1 12.6h2.2"/><circle cx="15.8" cy="12.6" r=".95" fill="currentColor" stroke="none"/></symbol><symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9.5" y="2.8" width="5" height="10.4" rx="2.5"/><path d="M5.6 11.2a6.4 6.4 0 0 0 12.8 0"/><path d="M12 17.6v3.6"/></symbol><symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 9.4h3l4.4-3.7a.8.8 0 0 1 1.3.6v11.4a.8.8 0 0 1-1.3.6l-4.4-3.7h-3a.9.9 0 0 1-.9-.9v-3.4a.9.9 0 0 1 .9-.9z"/><path d="M16.6 9.2a4 4 0 0 1 0 5.6M19.2 6.6a7.6 7.6 0 0 1 0 10.8"/></symbol><symbol id="i-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="6" width="19.2" height="12" rx="2"/><path d="M6 9.6h.01M9.6 9.6h.01M13.2 9.6h.01M16.8 9.6h.01M6 12.9h.01M9.6 12.9h.01M13.2 12.9h.01M16.8 12.9h.01M8.2 15.7h7.6"/></symbol><symbol id="i-mouse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6.4" y="2.5" width="11.2" height="19" rx="5.6"/><path d="M12 6.4v3.8"/></symbol><symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.6 8.6h3.2l1.5-2.6h9.4l1.5 2.6h3.2a.9.9 0 0 1 .9.9v8a.9.9 0 0 1-.9.9H2.6a.9.9 0 0 1-.9-.9v-8a.9.9 0 0 1 .9-.9z"/><circle cx="12" cy="13.4" r="3.4"/></symbol><symbol id="i-display" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="4" width="19.2" height="13" rx="2"/><path d="M9 21.2h6M12 17.2v4"/></symbol></defs></svg>
+
+<header class="masthead">
+  <div class="wrap grid">
+    <div class="c7">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z" fill="#c9cfd6"/>
+          <circle cx="21.5" cy="16.5" r="1.9" fill="#ff7a18"/>
+          <rect x="8" y="15.4" width="6" height="2.2" rx="1.1" fill="#14181c"/>
+          <rect x="9.9" y="13.5" width="2.2" height="6" rx="1.1" fill="#14181c"/>
+        </svg>
+        <span class="brandname">Hardware Test Bench</span>
+      </a>
+      <h1>Keyboard tester</h1>
+      <p class="tagline">Press keys and watch them light up. Every key you prove works stays marked, so you can see at a glance which ones never answered.</p>
+    </div>
+    <div class="c5 status-wrap">
+      <p class="status" id="status" role="status" aria-live="polite">
+        <span class="status__dot" aria-hidden="true"></span>
+        <span id="statusText">Ready for key presses</span>
+      </p>
+    </div>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Hardware tests">
+  <div class="wrap rail__inner">
+      <a href="/"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><span>Gamepad</span></a>
+      <a href="/microphone-test"><svg aria-hidden="true"><use href="#i-mic"></use></svg><span>Microphone</span></a>
+      <a href="/speaker-test"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><span>Speakers</span></a>
+      <a href="/keyboard-test" aria-current="page"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><span>Keyboard</span></a>
+      <a href="/mouse-test"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><span>Mouse</span></a>
+      <a href="/webcam-test"><svg aria-hidden="true"><use href="#i-camera"></use></svg><span>Webcam</span></a>
+      <a href="/screen-test"><svg aria-hidden="true"><use href="#i-display"></use></svg><span>Screen</span></a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- board -->
+    <section class="panel c12" aria-labelledby="h-board">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-board">Keyboard</h2>
+        <label class="switch switch--inline">
+          <input type="checkbox" id="capture" checked>
+          <span>Capture keys — stop browser shortcuts firing</span>
+        </label>
+      </div>
+
+      <div class="boardscroll">
+        <div class="board" id="board" tabindex="0"
+             role="application" aria-label="Keyboard layout. Press keys to test them.">
+          <div class="block block--main" id="blkMain"></div>
+          <div class="block block--nav" id="blkNav"></div>
+          <div class="block block--num" id="blkNum"></div>
+        </div>
+      </div>
+
+      <p class="stage__note" id="boardNote">Click the layout, then press keys. Orange means held,
+      teal means proven working. Press <kbd>Esc</kbd> twice to release capture.</p>
+    </section>
+
+    <!-- live event -->
+    <section class="panel c4" aria-labelledby="h-ev">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-ev">Last key</h2>
+        <span class="panel__note" id="evNote">waiting</span>
+      </div>
+      <p class="bigkey"><strong id="evKey">—</strong></p>
+      <dl class="spec">
+        <div><dt>Physical code</dt><dd id="evCode">—</dd></div>
+        <div><dt>Character</dt><dd id="evChar">—</dd></div>
+        <div><dt>keyCode</dt><dd id="evNum">—</dd></div>
+        <div><dt>Location</dt><dd id="evLoc">—</dd></div>
+        <div><dt>Held repeat</dt><dd id="evRep">—</dd></div>
+        <div><dt>Modifiers</dt><dd id="evMod">—</dd></div>
+      </dl>
+    </section>
+
+    <!-- coverage -->
+    <section class="panel c4" aria-labelledby="h-cov">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-cov">Coverage</h2>
+        <button class="btn" id="reset" style="padding:4px 9px;font-size:12px;align-self:center">Reset</button>
+      </div>
+      <p class="tally"><strong id="covCount">0</strong><span>of <em id="covTotal" style="font-style:normal">0</em> keys proven</span></p>
+      <div class="meter" style="margin-bottom:16px">
+        <b>Tested</b>
+        <div class="meter__track"><div class="meter__fill meter__fill--analog" id="covFill"></div></div>
+        <span class="meter__val" id="covPct">0%</span>
+      </div>
+      <div class="note" id="covNote">
+        <p class="note__msg" id="covMsg">Work across the board in rows rather than hunting. Keys you
+        have never pressed stay grey, so the gaps are the answer.</p>
+      </div>
+      <dl class="spec" style="margin-top:auto">
+        <div><dt>Keys off this layout</dt><dd id="extraCount">0</dd></div>
+        <div><dt>Total presses</dt><dd id="pressCount">0</dd></div>
+      </dl>
+    </section>
+
+    <!-- rollover -->
+    <section class="panel c4" aria-labelledby="h-roll">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-roll">Rollover and chatter</h2>
+        <span class="panel__note" id="rollNote">hold several keys</span>
+      </div>
+      <p class="tally"><strong id="rollNow">0</strong><span>keys held right now</span></p>
+      <dl class="spec">
+        <div><dt>Most at once</dt><dd id="rollMax">0</dd></div>
+        <div><dt>Suspected chatter</dt><dd id="chatCount">0</dd></div>
+        <div><dt>Fastest repeat gap</dt><dd id="chatGap">—</dd></div>
+      </dl>
+      <div class="note" id="rollNoteBox" style="margin-top:16px">
+        <p class="note__msg" id="rollMsg">Hold four keys together. Membrane keyboards usually stop
+        around two or three; anything past six is full N-key rollover.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="info grid">
+    <article class="c4">
+      <h2>Code, key and keyCode</h2>
+      <p>The physical <em>code</em> describes where a key sits and never changes with your language
+      layout. The <em>key</em> is the character that position currently produces, which does. If a
+      key lights here but types the wrong letter, your layout setting is the culprit, not the
+      hardware.</p>
+    </article>
+    <article class="c4">
+      <h2>Ghosting explained</h2>
+      <p>Cheap keyboards wire their switches into a shared grid to save on components. Certain
+      three-key combinations become ambiguous in that grid, so the keyboard drops the third press
+      rather than guess. That is ghosting, and it is a design limit rather than a fault.</p>
+    </article>
+    <article class="c4">
+      <h2>Keys no browser can see</h2>
+      <p>Fn is resolved inside the keyboard itself and never reaches the computer. Alt+Tab,
+      Ctrl+Alt+Delete and the Windows key are claimed by the operating system before any page sees
+      them. None of those showing up here is normal and expected.</p>
+    </article>
+  </div>
+
+
+  <!-- how to use -->
+  <section class="section" id="how-to" aria-labelledby="h-how">
+    <div class="section__head">
+      <h2 id="h-how">How to use the keyboard test</h2>
+      <p>Capture mode keeps browser shortcuts from firing while you test. Press Escape twice at any point to release it.</p>
+    </div>
+    <ol class="steps grid">
+      <li class="step c4">
+        <h3>Click the layout, then start pressing</h3>
+        <p>Click once anywhere on the keyboard drawing so the page has focus. Keys light orange as you hold them and stay marked teal once proven.</p>
+        <p>Work in rows rather than hunting: top row across, then each row down. That way you notice the gap rather than forgetting which keys you already did.</p>
+      </li>
+      <li class="step c4">
+        <h3>Watch the live event readout</h3>
+        <p>Every press shows its physical <code>code</code>, the <code>key</code> character it produces, and whether the event is a repeat. That distinction matters: a key can be physically fine but mapped wrong by your layout.</p>
+        <p>If a key produces the wrong character, the fault is your keyboard layout setting rather than the hardware.</p>
+      </li>
+      <li class="step c4">
+        <h3>Hold several keys to test rollover</h3>
+        <p>Hold three or four keys together and watch the simultaneous counter. Cheap membrane keyboards stop registering after two or three keys in the same area, which is called ghosting.</p>
+        <p>Gaming keyboards with N-key rollover keep counting well past six. Try WASD plus space plus shift, the combination that actually matters in games.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- faq -->
+  <section class="section" id="faq" aria-labelledby="h-faq">
+    <div class="section__head">
+      <h2 id="h-faq">Questions people ask</h2>
+      <p>Dead keys, double typing, ghosting, and the keys a browser is never allowed to see.</p>
+    </div>
+    <div class="faq">
+    <details open>
+      <summary>Why is one of my keys not registering?</summary>
+      <div class="faq__a">
+        <p>If a key never lights here, the signal is not reaching the browser at all. Try it in a text editor to confirm, then unplug and reconnect the keyboard, try a different USB port, and test on another computer if you can.</p>
+        <p>A single dead key on a mechanical keyboard is often a failed switch, which is replaceable. On a membrane or laptop keyboard it usually means debris under the key or a damaged membrane sheet, and a liquid spill is the usual cause.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What is key ghosting and N-key rollover?</summary>
+      <div class="faq__a">
+        <p>Ghosting is when a keyboard stops registering additional keys because of how its switches are wired into a shared matrix. Press three keys in the wrong arrangement and the third simply never arrives.</p>
+        <p>N-key rollover means every key is read independently, so any number can register at once. Hold several keys here and watch the counter to see which kind you own. Six is a common limit on USB keyboards and is plenty for most use.</p>
+      </div>
+    </details>
+    <details>
+      <summary>How do I test for a chattering or double-typing key?</summary>
+      <div class="faq__a">
+        <p>Chatter is a worn switch that sends two presses from one push. Press the suspect key slowly and deliberately about twenty times and watch the press counter for that key.</p>
+        <p>If the count climbs faster than you pressed, the switch is bouncing. On a hot-swappable keyboard you can replace the switch; otherwise some keyboards let you raise the debounce time in their configuration software.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why do browser shortcuts still fire sometimes?</summary>
+      <div class="faq__a">
+        <p>Capture mode stops most keys reaching the browser, but a handful are reserved by the operating system and can never be intercepted by a web page. That is a security boundary rather than a limitation of this test.</p>
+        <p>Ctrl+W, Alt+Tab, Ctrl+Alt+Delete, Command+Q and the Windows key are the usual ones. Test those in your own operating system rather than in a browser tab.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why don't Fn, media keys or the power button show up?</summary>
+      <div class="faq__a">
+        <p>The Fn key is handled inside the keyboard itself and never sends a key code to the computer, so no software on any platform can see it. It is not broken.</p>
+        <p>Media keys and brightness keys often go straight to the operating system too. If volume actually changes when you press them, they work, even though nothing lights up here.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can I test a laptop keyboard?</summary>
+      <div class="faq__a">
+        <p>Yes, and it works the same way. The layout drawn here is a full-size one, so a laptop without a number pad will simply leave that block unmarked, which is expected.</p>
+        <p>If several neighbouring keys are dead on a laptop, suspect the ribbon cable or a spill rather than individual switches.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What do code, key and keyCode mean?</summary>
+      <div class="faq__a">
+        <p><code>code</code> is the physical position on the keyboard and does not change with your language layout. <code>key</code> is the character that position currently produces, which does.</p>
+        <p>So on a French AZERTY layout the key next to Tab reports a code of KeyQ but a key of 'a'. <code>keyCode</code> is an older number that browsers still report for compatibility.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can I test a keyboard on a phone or tablet?</summary>
+      <div class="faq__a">
+        <p>Only a physical one. On-screen touch keyboards send text rather than key events, so most of what this page measures does not apply to them.</p>
+        <p>A Bluetooth or USB keyboard attached to a phone or tablet does work, and reports the same codes it would on a desktop.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Does the test record what I type?</summary>
+      <div class="faq__a">
+        <p>No. Key events are read, drawn on screen and discarded. Nothing is sent anywhere, nothing is stored, and reloading the page clears every mark.</p>
+        <p>For obvious reasons, do not type passwords into any keyboard test, here or anywhere else. Test with ordinary letters.</p>
+      </div>
+    </details>
+    <details>
+      <summary>My key repeats on its own. What causes that?</summary>
+      <div class="faq__a">
+        <p>A key that fires continuously without being held usually has something physically holding the switch down: debris, a sticky spill, or a keycap fouling its housing. Pull the cap and check underneath.</p>
+        <p>If nothing is stuck, the switch has failed closed and needs replacing. In the meantime most operating systems let you remap the key to nothing so it stops interrupting you.</p>
+      </div>
+    </details>
+    </div>
+  </section>
+
+  <!-- other tools -->
+  <section class="section" id="more" aria-labelledby="h-more">
+    <div class="section__head">
+      <h2 id="h-more">Test the rest of your setup</h2>
+      <p>Every tool runs in this tab, reads your hardware directly through the browser, and stores nothing.</p>
+    </div>
+    <div class="tools">
+    <a class="tool" href="/">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><b>Gamepad</b></span>
+      <p>Check buttons, analog sticks, triggers, the D-pad and rumble, and measure stick drift.</p>
+    </a>
+    <a class="tool" href="/microphone-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-mic"></use></svg><b>Microphone</b></span>
+      <p>Live waveform, level meter in dBFS, noise floor reading, and instant record and playback.</p>
+    </a>
+    <a class="tool" href="/speaker-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><b>Speakers</b></span>
+      <p>Left and right channel checks, a tone generator, and a 20 Hz to 20 kHz hearing sweep.</p>
+    </a>
+    <a class="tool" href="/mouse-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><b>Mouse</b></span>
+      <p>Buttons, scroll wheel, movement trace, polling rate in Hz, and a double-click chatter check.</p>
+    </a>
+    <a class="tool" href="/webcam-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-camera"></use></svg><b>Webcam</b></span>
+      <p>Live preview, real resolution and measured frame rate, camera switching and snapshots.</p>
+    </a>
+    <a class="tool" href="/screen-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-display"></use></svg><b>Screen</b></span>
+      <p>Dead pixel hunt, backlight bleed check, gradient banding, and a measured refresh rate.</p>
+    </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav class="foot-links" aria-label="All tests">
+      <a href="/">Gamepad test</a>
+      <a href="/">Gamepad</a>
+      <a href="/microphone-test">Microphone</a>
+      <a href="/speaker-test">Speakers</a>
+      <a href="/mouse-test">Mouse</a>
+      <a href="/webcam-test">Webcam</a>
+      <a href="/screen-test">Screen</a>
+    </nav>
+    <div class="grid">
+      <p class="sig c6"><b>Melted Code</b> — browser hardware diagnostics</p>
+      <p class="foot-note c6">Runs entirely on your device. Nothing you press, say or show is recorded or uploaded.</p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  "use strict";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var statusEl = $("status"), statusText = $("statusText");
+  var board = $("board");
+
+  /* ── layout: [code, label, width units] ────────────────────────────── */
+  var G = ["", "", 1];  /* spacer */
+
+  var MAIN = [
+    [["Escape","Esc",1], G, ["F1","F1",1],["F2","F2",1],["F3","F3",1],["F4","F4",1], G,
+     ["F5","F5",1],["F6","F6",1],["F7","F7",1],["F8","F8",1], G,
+     ["F9","F9",1],["F10","F10",1],["F11","F11",1],["F12","F12",1]],
+    [["Backquote","`",1],["Digit1","1",1],["Digit2","2",1],["Digit3","3",1],["Digit4","4",1],
+     ["Digit5","5",1],["Digit6","6",1],["Digit7","7",1],["Digit8","8",1],["Digit9","9",1],
+     ["Digit0","0",1],["Minus","-",1],["Equal","=",1],["Backspace","Backspace",2]],
+    [["Tab","Tab",1.5],["KeyQ","Q",1],["KeyW","W",1],["KeyE","E",1],["KeyR","R",1],["KeyT","T",1],
+     ["KeyY","Y",1],["KeyU","U",1],["KeyI","I",1],["KeyO","O",1],["KeyP","P",1],
+     ["BracketLeft","[",1],["BracketRight","]",1],["Backslash","\\",1.5]],
+    [["CapsLock","Caps",1.75],["KeyA","A",1],["KeyS","S",1],["KeyD","D",1],["KeyF","F",1],
+     ["KeyG","G",1],["KeyH","H",1],["KeyJ","J",1],["KeyK","K",1],["KeyL","L",1],
+     ["Semicolon",";",1],["Quote","'",1],["Enter","Enter",2.25]],
+    [["ShiftLeft","Shift",2.25],["KeyZ","Z",1],["KeyX","X",1],["KeyC","C",1],["KeyV","V",1],
+     ["KeyB","B",1],["KeyN","N",1],["KeyM","M",1],["Comma",",",1],["Period",".",1],
+     ["Slash","/",1],["ShiftRight","Shift",2.75]],
+    [["ControlLeft","Ctrl",1.25],["MetaLeft","Meta",1.25],["AltLeft","Alt",1.25],
+     ["Space","Space",6.25],["AltRight","Alt",1.25],["MetaRight","Meta",1.25],
+     ["ContextMenu","Menu",1.25],["ControlRight","Ctrl",1.25]]
+  ];
+
+  var NAV = [
+    [["PrintScreen","PrtSc",1],["ScrollLock","ScrLk",1],["Pause","Pause",1]],
+    [["Insert","Ins",1],["Home","Home",1],["PageUp","PgUp",1]],
+    [["Delete","Del",1],["End","End",1],["PageDown","PgDn",1]],
+    [G, G, G],
+    [G, ["ArrowUp","\u2191",1], G],
+    [["ArrowLeft","\u2190",1],["ArrowDown","\u2193",1],["ArrowRight","\u2192",1]]
+  ];
+
+  var NUM = [
+    [["NumLock","Num",1],["NumpadDivide","/",1],["NumpadMultiply","*",1],["NumpadSubtract","-",1]],
+    [["Numpad7","7",1],["Numpad8","8",1],["Numpad9","9",1],["NumpadAdd","+",1]],
+    [["Numpad4","4",1],["Numpad5","5",1],["Numpad6","6",1],G],
+    [["Numpad1","1",1],["Numpad2","2",1],["Numpad3","3",1],["NumpadEnter","Ent",1]],
+    [["Numpad0","0",2],["NumpadDecimal",".",1],G]
+  ];
+
+  /* ── render ────────────────────────────────────────────────────────── */
+  var keyEls = {};   /* code -> element */
+  var total = 0;
+
+  function build(block, rows, gapAfter){
+    rows.forEach(function(row, ri){
+      var r = document.createElement("div");
+      r.className = "krow" + (gapAfter && gapAfter.indexOf(ri) > -1 ? " krow--gap" : "");
+      row.forEach(function(k){
+        var el = document.createElement("div");
+        var code = k[0], label = k[1], w = k[2];
+        el.style.setProperty("--w", w);
+        if (!code){
+          el.className = "k k--blank";
+        } else {
+          el.className = "k" + (w >= 1.75 ? " k--wide" : "");
+          el.textContent = label;
+          el.dataset.code = code;
+          keyEls[code] = el;
+          total++;
+        }
+        r.appendChild(el);
+      });
+      block.appendChild(r);
+    });
+  }
+
+  build($("blkMain"), MAIN, [0]);
+  build($("blkNav"), NAV, [0]);
+  build($("blkNum"), NUM);
+
+  $("covTotal").textContent = total;
+
+  /* left and right modifiers share a physical label pair; treat separately */
+  var ALIASES = { "OSLeft": "MetaLeft", "OSRight": "MetaRight" };
+
+  /* ── state ─────────────────────────────────────────────────────────── */
+  var held = {}, heldCount = 0, rollMax = 0;
+  var tested = {}, covered = 0;
+  var presses = 0, extras = {}, extraCount = 0;
+  var lastDown = {}, chatter = 0, minGap = Infinity;
+  var escStamp = 0;
+
+  function paintCoverage(){
+    $("covCount").textContent = covered;
+    var pctv = total ? Math.round(covered / total * 100) : 0;
+    $("covFill").style.width = pctv + "%";
+    $("covPct").textContent = pctv + "%";
+    var n = $("covNote");
+    if (pctv === 100){
+      n.className = "note ok";
+      $("covMsg").textContent = "Every key on this layout answered. Nothing is dead.";
+    } else if (pctv > 85){
+      n.className = "note";
+      $("covMsg").textContent = "Nearly there. The remaining grey keys are the ones worth looking at.";
+    }
+  }
+
+  function markTested(code){
+    var el = keyEls[code];
+    if (!el || tested[code]) return;
+    tested[code] = true;
+    covered++;
+    el.classList.add("tested");
+    paintCoverage();
+  }
+
+  function describe(e){
+    $("evKey").textContent = e.key === " " ? "Space" : (e.key.length ? e.key : "—");
+    $("evCode").textContent = e.code || "—";
+    $("evChar").textContent = e.key === " " ? "(space)" : (e.key || "—");
+    $("evNum").textContent = e.keyCode || e.which || "—";
+    $("evLoc").textContent = ["standard","left","right","numpad"][e.location] || e.location;
+    $("evRep").textContent = e.repeat ? "yes" : "no";
+    var mods = [];
+    if (e.ctrlKey) mods.push("Ctrl");
+    if (e.shiftKey) mods.push("Shift");
+    if (e.altKey) mods.push("Alt");
+    if (e.metaKey) mods.push("Meta");
+    $("evMod").textContent = mods.length ? mods.join(" + ") : "none";
+    $("evNote").textContent = e.repeat ? "auto-repeat" : "pressed";
+  }
+
+  /* ── chatter: two presses of one key closer than a human can manage ── */
+  function checkChatter(code, now){
+    var prev = lastDown[code];
+    lastDown[code] = now;
+    if (!prev) return;
+    var gap = now - prev;
+    if (gap < minGap){ minGap = gap; $("chatGap").textContent = Math.round(minGap) + " ms"; }
+    if (gap < 50){
+      chatter++;
+      $("chatCount").textContent = chatter;
+      if (keyEls[code]) keyEls[code].classList.add("chatter");
+      var b = $("rollNoteBox");
+      b.className = "note warn";
+      $("rollMsg").textContent = "Two presses of one key arrived " + Math.round(gap) +
+        " ms apart, which is faster than a person can click. That key's switch is chattering.";
+    }
+  }
+
+  /* ── events ────────────────────────────────────────────────────────── */
+  function down(e){
+    var code = ALIASES[e.code] || e.code;
+
+    if (code === "Escape" && !e.repeat){
+      var now = performance.now();
+      if (now - escStamp < 600){
+        $("capture").checked = false;
+        setCaptureNote();
+        escStamp = 0;
+      } else escStamp = now;
+    }
+
+    if ($("capture").checked && e.key !== "F5" && !(e.ctrlKey && e.key === "r")){
+      e.preventDefault();
+    }
+
+    describe(e);
+    if (e.repeat) return;
+
+    presses++;
+    $("pressCount").textContent = presses;
+    checkChatter(code, performance.now());
+
+    if (!held[code]){
+      held[code] = true;
+      heldCount++;
+      if (heldCount > rollMax){
+        rollMax = heldCount;
+        $("rollMax").textContent = rollMax;
+        if (rollMax >= 6 && chatter === 0){
+          $("rollNoteBox").className = "note ok";
+          $("rollMsg").textContent = rollMax + " keys at once. That is full N-key rollover territory — nothing will be dropped in a game.";
+        } else if (rollMax >= 4 && chatter === 0){
+          $("rollNoteBox").className = "note";
+          $("rollMsg").textContent = rollMax + " keys at once. Comfortably past the point where cheap membrane boards give up.";
+        }
+      }
+      $("rollNow").textContent = heldCount;
+    }
+
+    if (keyEls[code]){
+      keyEls[code].classList.add("down");
+      markTested(code);
+    } else if (!extras[code]){
+      extras[code] = true;
+      extraCount++;
+      $("extraCount").textContent = extraCount;
+    }
+
+    statusEl.classList.add("is-live");
+    statusText.textContent = "Reading key events";
+  }
+
+  function up(e){
+    var code = ALIASES[e.code] || e.code;
+    if ($("capture").checked) e.preventDefault();
+    if (held[code]){
+      delete held[code];
+      heldCount = Math.max(0, heldCount - 1);
+      $("rollNow").textContent = heldCount;
+    }
+    if (keyEls[code]) keyEls[code].classList.remove("down");
+    $("evNote").textContent = "released";
+  }
+
+  window.addEventListener("keydown", down);
+  window.addEventListener("keyup", up);
+
+  /* a lost window drops keyup events, so clear anything still marked down */
+  window.addEventListener("blur", function(){
+    Object.keys(held).forEach(function(c){ if (keyEls[c]) keyEls[c].classList.remove("down"); });
+    held = {}; heldCount = 0;
+    $("rollNow").textContent = "0";
+  });
+
+  function setCaptureNote(){
+    $("boardNote").innerHTML = $("capture").checked
+      ? 'Click the layout, then press keys. Orange means held, teal means proven working. Press <kbd>Esc</kbd> twice to release capture.'
+      : 'Capture is off, so browser and system shortcuts work normally again. Keys are still read and marked.';
+  }
+  $("capture").addEventListener("change", setCaptureNote);
+
+  board.addEventListener("click", function(){ board.focus(); });
+
+  $("reset").addEventListener("click", function(){
+    Object.keys(keyEls).forEach(function(c){
+      keyEls[c].classList.remove("tested", "down", "chatter");
+    });
+    tested = {}; covered = 0; presses = 0; extras = {}; extraCount = 0;
+    held = {}; heldCount = 0; rollMax = 0;
+    lastDown = {}; chatter = 0; minGap = Infinity;
+    $("rollNow").textContent = $("rollMax").textContent = "0";
+    $("chatCount").textContent = "0";
+    $("chatGap").textContent = "—";
+    $("extraCount").textContent = $("pressCount").textContent = "0";
+    $("covNote").className = "note";
+    $("covMsg").textContent = "Work across the board in rows rather than hunting. Keys you have never pressed stay grey, so the gaps are the answer.";
+    $("rollNoteBox").className = "note";
+    $("rollMsg").textContent = "Hold four keys together. Membrane keyboards usually stop around two or three; anything past six is full N-key rollover.";
+    paintCoverage();
+  });
+
+  paintCoverage();
+})();
+
+</script>
+</body>
+</html>

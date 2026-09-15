@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mouse Test — Check Buttons, Scroll Wheel, Double Click and Polling Rate</title>
+<meta name="description" content="Free online mouse test. Check left, right, middle and side buttons, test the scroll wheel, measure polling rate in Hz, and detect double-click chatter from a worn switch.">
+<link rel="canonical" href="https://gamepad-tester.vercel.app/mouse-test">
+<meta name="theme-color" content="#14181C">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hardware Test Bench">
+<meta property="og:title" content="Mouse Test — Check Buttons, Scroll Wheel, Double Click and Polling Rate">
+<meta property="og:description" content="Free online mouse test. Check left, right, middle and side buttons, test the scroll wheel, measure polling rate in Hz, and detect double-click chatter from a worn switch.">
+<meta property="og:url" content="https://gamepad-tester.vercel.app/mouse-test">
+<meta property="og:image" content="https://gamepad-tester.vercel.app/og.png">
+<meta property="og:image:alt" content="A dark instrument panel lighting up as hardware is tested.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mouse Test — Check Buttons, Scroll Wheel, Double Click and Polling Rate">
+<meta name="twitter:description" content="Free online mouse test. Check left, right, middle and side buttons, test the scroll wheel, measure polling rate in Hz, and detect double-click chatter from a worn switch.">
+<meta name="twitter:image" content="https://gamepad-tester.vercel.app/og.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181C'/%3E%3Cpath d='M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z' fill='%23C9CFD6'/%3E%3Ccircle cx='21.5' cy='16.5' r='1.8' fill='%23FF7A18'/%3E%3Crect x='8' y='15.4' width='6' height='2.2' rx='1.1' fill='%2314181C'/%3E%3Crect x='9.9' y='13.5' width='2.2' height='6' rx='1.1' fill='%2314181C'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&amp;family=Work+Sans:ital,wght@0,300..700;1,400&amp;display=swap"></noscript>
+<link rel="stylesheet" href="/assets/base.css">
+<style>
+/* ── test pad ───────────────────────────────────────────────────────── */
+.pad{
+  position:relative;
+  border:1px solid var(--rule);
+  border-radius:var(--r-chip);
+  background:
+    linear-gradient(var(--rule-soft),var(--rule-soft)) center/100% 1px no-repeat,
+    linear-gradient(var(--rule-soft),var(--rule-soft)) center/1px 100% no-repeat,
+    var(--panel-hi);
+  overflow:hidden;
+  cursor:crosshair;
+  touch-action:none;
+}
+.pad canvas{display:block;width:100%;height:auto}
+.pad__hint{
+  position:absolute;inset:0;
+  display:grid;place-content:center;
+  font-size:14px;color:var(--dim);
+  pointer-events:none;
+  transition:opacity .25s;
+}
+.pad__hint.gone{opacity:0}
+.pad__xy{
+  position:absolute;left:10px;bottom:8px;
+  font-family:var(--mono);font-size:11.5px;color:var(--dim);
+  pointer-events:none;
+}
+.pad__xy em{font-style:normal;color:var(--muted)}
+
+/* ── mouse diagram ──────────────────────────────────────────────────── */
+.mouse{width:100%;max-width:168px;height:auto;display:block;margin:0 auto}
+.m-body{fill:url(#gBody);stroke:#6f777f;stroke-width:1.4}
+.m-btn{fill:#2f363d;stroke:#5c646c;stroke-width:1.1;transition:fill .04s linear}
+.m-side{fill:#39414a}
+.m-btn.on{fill:var(--signal);filter:drop-shadow(0 0 7px rgba(255,122,24,.55))}
+.m-seam{stroke:#6f777f;stroke-width:1.2;fill:none;opacity:.7}
+.m-legend{
+  font-family:var(--ui);font-size:13px;font-weight:600;
+  fill:#aeb6bf;text-anchor:middle;pointer-events:none;
+}
+
+/* ── wheel ──────────────────────────────────────────────────────────── */
+.wheelpad{display:grid;justify-items:center;gap:6px;margin-bottom:18px}
+.wheelpad__mid{display:flex;align-items:center;gap:10px}
+.wheelpad__arrow{
+  width:30px;height:24px;
+  display:grid;place-content:center;
+  border:1px solid var(--rule);border-radius:var(--r-chip);
+  background:var(--panel-hi);
+  font-size:13px;color:var(--dim);
+  transition:background .06s,color .06s,border-color .06s;
+}
+.wheelpad__arrow.on{
+  background:var(--signal);border-color:var(--signal);color:#14181c;
+  box-shadow:0 0 10px rgba(255,122,24,.4);
+}
+.wheelpad__drum{
+  width:30px;height:62px;
+  border:1px solid var(--rule);border-radius:15px;
+  background:var(--panel-hi);
+  overflow:hidden;position:relative;
+}
+.wheelpad__drum i{
+  position:absolute;left:0;right:0;top:0;height:200%;
+  background:repeating-linear-gradient(
+    180deg,
+    var(--rule) 0 2px,
+    transparent 2px 9px
+  );
+  will-change:transform;
+}
+
+/* ── clicker ────────────────────────────────────────────────────────── */
+.clicker{
+  display:grid;justify-items:center;gap:4px;
+  width:100%;padding:24px 14px;
+  background:var(--panel-hi);
+  border:1px solid var(--rule);
+  border-radius:var(--r-chip);
+  cursor:pointer;
+  transition:border-color .1s,background .1s;
+}
+.clicker:hover{border-color:var(--dim)}
+.clicker:active{background:rgba(255,122,24,.12);border-color:var(--signal)}
+.clicker b{
+  font-family:var(--display);font-size:34px;font-weight:600;
+  font-variation-settings:"wdth" 88;letter-spacing:-.03em;line-height:1;
+}
+.clicker span{font-size:12.5px;color:var(--muted)}
+
+.stage__note{
+  font-size:12.5px;color:var(--muted);
+  padding:12px 4px 2px;border-top:1px solid var(--rule-soft);margin-top:14px;
+}
+.note__msg{font-size:12.5px;color:var(--muted);line-height:1.45}
+.note.ok .note__msg{color:#a8e8e0}
+.note.warn .note__msg{color:#ffa3a3}
+.chips .chip{cursor:default}
+
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://gamepad-tester.vercel.app/#website",
+      "url": "https://gamepad-tester.vercel.app/",
+      "name": "Hardware Test Bench",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://gamepad-tester.vercel.app/mouse-test#app",
+      "name": "Mouse Test",
+      "url": "https://gamepad-tester.vercel.app/mouse-test",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Windows, macOS, Linux, Android, iOS, ChromeOS",
+      "browserRequirements": "Modern browser, no plugins or downloads",
+      "description": "Browser tool that reads mouse input so you can test every button, the scroll wheel, movement and polling rate, and detect double-click chatter.",
+      "isPartOf": {
+        "@id": "https://gamepad-tester.vercel.app/#website"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Melted Code",
+        "@id": "https://gamepad-tester.vercel.app/#org"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://gamepad-tester.vercel.app/mouse-test#crumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://gamepad-tester.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Mouse",
+          "item": "https://gamepad-tester.vercel.app/mouse-test"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://gamepad-tester.vercel.app/mouse-test#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is double-click chatter and how do I test for it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Chatter is a worn or dirty switch sending two clicks from one press. It is the single most common mouse fault, and it shows up as files opening when you meant to select them, or dragging that drops halfway. Click one button twenty times slowly and watch the chatter counter. Any interval under about 50 milliseconds is faster than a human can click, so each one flagged is the switch misbehaving rather than you."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I fix a mouse that double clicks?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Often, yes. Many switches fail because of oxidation on the contacts rather than mechanical wear, and working the button hard a few hundred times sometimes clears it temporarily. Contact cleaner applied inside the switch works better and lasts longer. The permanent fix is replacing the switch, which is a cheap part but needs soldering. Check the warranty first, because several manufacturers cover this fault for years and it is a known defect on some popular models."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why don't my side buttons register?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The usual cause is software rather than hardware. Manufacturer utilities from Logitech, Razer, Corsair and others often bind side buttons to macros or profile switching, and those never reach the browser as ordinary button events. Set the buttons back to their default forward and back actions in that software and retest. If they still do nothing here but work elsewhere, the browser is filtering them; if they do nothing anywhere, the switch has failed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is polling rate and does a higher one matter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Polling rate is how often the mouse reports its position, measured in Hz. 125 Hz means eight milliseconds between updates; 1000 Hz means one. Above about 500 Hz the returns diminish sharply for most people. What matters more is consistency: a rate that swings wildly points at a failing cable, a congested USB hub, or wireless interference."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How accurate is the polling rate shown here?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Treat it as an indication rather than a measurement. Browsers coalesce mouse events and tie them to the display refresh, so a 1000 Hz mouse often reports lower here even when it is working perfectly. Use it to compare a mouse against itself over time, or to spot a rate that collapses during movement. For an exact figure, use a dedicated desktop utility."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this test measure DPI or sensor accuracy?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No, and no web page can measure DPI reliably. The browser reports movement in CSS pixels after the operating system has already applied pointer acceleration and display scaling, so the raw sensor counts are gone before they arrive. The movement trace is still useful for spotting jitter, stutter and a sensor that loses tracking on a reflective surface."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why doesn't the right-click menu appear?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It is suppressed inside the test pad on purpose, because the context menu would open over the diagram and swallow the button event before it could be read. Right-click works normally everywhere else on the page. Move the pointer outside the pad if you need the menu."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I test a trackpad or a trackball?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Both report the same events as a mouse, so buttons, scrolling and movement all register. Trackpad gestures arrive as scroll events, which is why two-finger scrolling shows up here. Polling rate is not meaningful on a trackpad, since the numbers reflect the gesture engine rather than a sensor."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "My scroll wheel skips or jumps backwards.",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "That is a worn optical encoder inside the wheel, and it is a common failure. Dust on the encoder wheel gives the same symptom and is worth ruling out first with compressed air. Some mice have a free-spin mode that disengages the notched mechanism, so check you have not toggled it accidentally before assuming a fault."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my pointer movement being tracked?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Only inside this page, only while it is open, and only to draw on screen. No coordinates, clicks or timings leave your browser, and nothing is stored."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "@id": "https://gamepad-tester.vercel.app/mouse-test#howto",
+      "name": "How to use the mouse test",
+      "totalTime": "PT2M",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Click every button in the pad",
+          "text": "Move into the test pad and click left, right and middle, then press the thumb buttons if your mouse has them. Each one lights on the diagram and ticks off in the tally. A button that clicks physically but never lights is a failed switch or a broken solder joint, and on side buttons it is often just a driver profile that has unbound them.",
+          "url": "https://gamepad-tester.vercel.app/mouse-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Scroll, and scroll back",
+          "text": "Roll the wheel slowly in both directions, then press it in for middle click and tilt it sideways if it tilts. Each notch shows up as a step. A wheel that occasionally jumps the wrong way has a dirty or worn encoder. Scrolling slowly makes it obvious in a way that fast scrolling hides.",
+          "url": "https://gamepad-tester.vercel.app/mouse-test#how-to"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Run the chatter and rate checks",
+          "text": "Click the same button twenty times, deliberately and slowly. The chatter check flags any pair of clicks arriving too close together to be human. Then sweep the mouse steadily across the pad to measure polling rate. Higher is smoother, but what matters most is that it stays steady rather than collapsing.",
+          "url": "https://gamepad-tester.vercel.app/mouse-test#how-to"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C9C7L3L68W"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-C9C7L3L68W');
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8a4 4 0 0 1 3.9 3.1l1 4.4c.4 1.9-2 2.9-3 1.3l-1.6-2.5a1.5 1.5 0 0 0-1.3-.7H8.9a1.5 1.5 0 0 0-1.3.7l-1.5 2.5c-1 1.6-3.4.6-3-1.3l1-4.4A4 4 0 0 1 8 9z"/><path d="M8.2 11.5v2.2M7.1 12.6h2.2"/><circle cx="15.8" cy="12.6" r=".95" fill="currentColor" stroke="none"/></symbol><symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9.5" y="2.8" width="5" height="10.4" rx="2.5"/><path d="M5.6 11.2a6.4 6.4 0 0 0 12.8 0"/><path d="M12 17.6v3.6"/></symbol><symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 9.4h3l4.4-3.7a.8.8 0 0 1 1.3.6v11.4a.8.8 0 0 1-1.3.6l-4.4-3.7h-3a.9.9 0 0 1-.9-.9v-3.4a.9.9 0 0 1 .9-.9z"/><path d="M16.6 9.2a4 4 0 0 1 0 5.6M19.2 6.6a7.6 7.6 0 0 1 0 10.8"/></symbol><symbol id="i-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="6" width="19.2" height="12" rx="2"/><path d="M6 9.6h.01M9.6 9.6h.01M13.2 9.6h.01M16.8 9.6h.01M6 12.9h.01M9.6 12.9h.01M13.2 12.9h.01M16.8 12.9h.01M8.2 15.7h7.6"/></symbol><symbol id="i-mouse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6.4" y="2.5" width="11.2" height="19" rx="5.6"/><path d="M12 6.4v3.8"/></symbol><symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.6 8.6h3.2l1.5-2.6h9.4l1.5 2.6h3.2a.9.9 0 0 1 .9.9v8a.9.9 0 0 1-.9.9H2.6a.9.9 0 0 1-.9-.9v-8a.9.9 0 0 1 .9-.9z"/><circle cx="12" cy="13.4" r="3.4"/></symbol><symbol id="i-display" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="4" width="19.2" height="13" rx="2"/><path d="M9 21.2h6M12 17.2v4"/></symbol></defs></svg>
+
+<header class="masthead">
+  <div class="wrap grid">
+    <div class="c7">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M10 12h12a5 5 0 0 1 4.9 4l1.2 6c.5 2.6-2.8 4-4.2 1.8l-2.2-3.4a2 2 0 0 0-1.7-.9h-8a2 2 0 0 0-1.7.9L8.1 23.8C6.7 26 3.4 24.6 3.9 22l1.2-6a5 5 0 0 1 4.9-4z" fill="#c9cfd6"/>
+          <circle cx="21.5" cy="16.5" r="1.9" fill="#ff7a18"/>
+          <rect x="8" y="15.4" width="6" height="2.2" rx="1.1" fill="#14181c"/>
+          <rect x="9.9" y="13.5" width="2.2" height="6" rx="1.1" fill="#14181c"/>
+        </svg>
+        <span class="brandname">Hardware Test Bench</span>
+      </a>
+      <h1>Mouse test</h1>
+      <p class="tagline">Click, scroll and move. Every button lights up, the wheel reports each notch, and the chatter check catches a switch that clicks twice.</p>
+    </div>
+    <div class="c5 status-wrap">
+      <p class="status" id="status" role="status" aria-live="polite">
+        <span class="status__dot" aria-hidden="true"></span>
+        <span id="statusText">Move the mouse to begin</span>
+      </p>
+    </div>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Hardware tests">
+  <div class="wrap rail__inner">
+      <a href="/"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><span>Gamepad</span></a>
+      <a href="/microphone-test"><svg aria-hidden="true"><use href="#i-mic"></use></svg><span>Microphone</span></a>
+      <a href="/speaker-test"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><span>Speakers</span></a>
+      <a href="/keyboard-test"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><span>Keyboard</span></a>
+      <a href="/mouse-test" aria-current="page"><svg aria-hidden="true"><use href="#i-mouse"></use></svg><span>Mouse</span></a>
+      <a href="/webcam-test"><svg aria-hidden="true"><use href="#i-camera"></use></svg><span>Webcam</span></a>
+      <a href="/screen-test"><svg aria-hidden="true"><use href="#i-display"></use></svg><span>Screen</span></a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- pad -->
+    <section class="panel c8" aria-labelledby="h-pad">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-pad">Test pad</h2>
+        <span class="panel__note" id="padNote">move, click and scroll inside the box</span>
+      </div>
+
+      <div class="pad" id="pad">
+        <canvas id="trace" width="900" height="420" role="img"
+                aria-label="Trace of recent pointer movement"></canvas>
+        <p class="pad__hint" id="padHint">Move the pointer in here</p>
+        <p class="pad__xy"><em id="px">0</em>, <em id="py">0</em></p>
+      </div>
+
+      <p class="stage__note">Right-click and middle-click menus are suppressed inside this box so
+      the buttons can be read. The rest of the page behaves normally.</p>
+    </section>
+
+    <!-- buttons -->
+    <section class="panel c4" aria-labelledby="h-btn">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-btn">Buttons</h2>
+        <span class="panel__note" id="btnNote">0 of 5 proven</span>
+      </div>
+
+      <svg class="mouse" viewBox="0 0 160 264" role="img" aria-label="Mouse diagram that lights up as you click">
+        <defs>
+          <linearGradient id="gBody" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#d3d9df"/>
+            <stop offset=".55" stop-color="#b3bbc3"/>
+            <stop offset="1" stop-color="#8d959d"/>
+          </linearGradient>
+        </defs>
+
+        <path class="m-body" d="M80 8c30 0 52 24 52 58v130c0 34-24 56-52 56s-52-22-52-56V66C28 32 50 8 80 8z"/>
+
+        <path class="m-btn" data-mb="0" d="M78 11c-25 .6-46 23-46 55v44h46z"/>
+        <path class="m-btn" data-mb="2" d="M82 11c25 .6 46 23 46 55v44H82z"/>
+        <path class="m-btn" data-mb="1" d="M72 42h16a8 8 0 0 1 8 8v30a8 8 0 0 1-8 8H72a8 8 0 0 1-8-8V50a8 8 0 0 1 8-8z"/>
+
+        <path class="m-btn m-side" data-mb="3" d="M27 118h11a3 3 0 0 1 3 3v18a3 3 0 0 1-3 3H27z"/>
+        <path class="m-btn m-side" data-mb="4" d="M27 148h11a3 3 0 0 1 3 3v18a3 3 0 0 1-3 3H27z"/>
+
+        <path class="m-seam" d="M80 12v98M32 110h96"/>
+
+        <text class="m-legend" x="47" y="76">L</text>
+        <text class="m-legend" x="113" y="76">R</text>
+        <text class="m-legend" x="52" y="133">4</text>
+        <text class="m-legend" x="52" y="163">5</text>
+      </svg>
+
+      <ul class="chips" id="chips" style="margin-top:16px">
+        <li class="chip" data-chip="0">Left</li>
+        <li class="chip" data-chip="2">Right</li>
+        <li class="chip" data-chip="1">Middle</li>
+        <li class="chip" data-chip="3">Back</li>
+        <li class="chip" data-chip="4">Forward</li>
+      </ul>
+    </section>
+
+    <!-- scroll -->
+    <section class="panel c4" aria-labelledby="h-scroll">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-scroll">Scroll wheel</h2>
+        <span class="panel__note" id="wheelNote">idle</span>
+      </div>
+
+      <div class="wheelpad">
+        <div class="wheelpad__arrow" id="wUp" aria-hidden="true">&#8593;</div>
+        <div class="wheelpad__mid">
+          <div class="wheelpad__arrow" id="wLeft" aria-hidden="true">&#8592;</div>
+          <div class="wheelpad__drum"><i id="drum"></i></div>
+          <div class="wheelpad__arrow" id="wRight" aria-hidden="true">&#8594;</div>
+        </div>
+        <div class="wheelpad__arrow" id="wDown" aria-hidden="true">&#8595;</div>
+      </div>
+
+      <dl class="spec">
+        <div><dt>Notches up</dt><dd id="wUpN">0</dd></div>
+        <div><dt>Notches down</dt><dd id="wDownN">0</dd></div>
+        <div><dt>Sideways</dt><dd id="wSide">0</dd></div>
+        <div><dt>Last delta</dt><dd id="wDelta">—</dd></div>
+        <div><dt>Reversals</dt><dd id="wRev">0</dd></div>
+      </dl>
+      <div class="note" id="wheelBox" style="margin-top:16px">
+        <p class="note__msg" id="wheelMsg">Scroll slowly in both directions. A wheel that jumps
+        backwards mid-scroll has a worn encoder.</p>
+      </div>
+    </section>
+
+    <!-- chatter -->
+    <section class="panel c4" aria-labelledby="h-chat">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-chat">Double-click check</h2>
+        <button class="btn" id="chatReset" style="padding:4px 9px;font-size:12px;align-self:center">Reset</button>
+      </div>
+
+      <button class="clicker" id="clicker">
+        <b id="clickCount">0</b>
+        <span>clicks — click me twenty times, slowly</span>
+      </button>
+
+      <dl class="spec" style="margin-top:16px">
+        <div><dt>Suspected chatter</dt><dd id="chatN">0</dd></div>
+        <div><dt>Shortest gap</dt><dd id="chatMin">—</dd></div>
+        <div><dt>Average gap</dt><dd id="chatAvg">—</dd></div>
+      </dl>
+
+      <div class="note" id="chatBox" style="margin-top:16px">
+        <p class="note__msg" id="chatMsg">Anything under 50 ms is faster than a human can click, so
+        each one flagged is the switch bouncing rather than you.</p>
+      </div>
+    </section>
+
+    <!-- rate -->
+    <section class="panel c4" aria-labelledby="h-rate">
+      <div class="panel__head">
+        <h2 class="panel__title" id="h-rate">Movement</h2>
+        <span class="panel__note">indicative</span>
+      </div>
+      <p class="tally"><strong id="hz">—</strong><span>Hz reported while moving</span></p>
+      <dl class="spec">
+        <div><dt>Pointer type</dt><dd id="ptype">—</dd></div>
+        <div><dt>Buttons held</dt><dd id="pbtn">none</dd></div>
+        <div><dt>Movement step</dt><dd id="pstep">—</dd></div>
+        <div><dt>Display scaling</dt><dd id="pdpr">—</dd></div>
+      </dl>
+      <div class="note" style="margin-top:16px">
+        <p class="note__msg">Browsers group pointer events to the display refresh, so treat this as
+        a health check rather than a measurement. A rate that collapses while you move is the
+        finding that matters.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="info grid">
+    <article class="c4">
+      <h2>Why chatter is the fault to look for</h2>
+      <p>A worn micro-switch sends two clicks from one press, and it is the most common way a mouse
+      dies. It shows up as files opening when you meant to select them, or a drag that drops
+      halfway. The switch is a cheap part, and several manufacturers cover this fault for years.</p>
+    </article>
+    <article class="c4">
+      <h2>Side buttons are usually software</h2>
+      <p>If the thumb buttons do nothing here, check the manufacturer's utility first. Logitech,
+      Razer and Corsair software often binds them to macros or profile switches, which never arrive
+      as ordinary button events. Reset them to forward and back, then retest.</p>
+    </article>
+    <article class="c4">
+      <h2>What a web page cannot measure</h2>
+      <p>DPI and raw sensor counts are gone before the browser sees them: the operating system has
+      already applied pointer acceleration and display scaling. The movement trace is still good for
+      spotting jitter and a sensor losing grip on a shiny desk.</p>
+    </article>
+  </div>
+
+
+  <!-- how to use -->
+  <section class="section" id="how-to" aria-labelledby="h-how">
+    <div class="section__head">
+      <h2 id="h-how">How to use the mouse test</h2>
+      <p>Right-click and middle-click menus are suppressed inside the test pad so the buttons can be read properly. Everywhere else on the page behaves normally.</p>
+    </div>
+    <ol class="steps grid">
+      <li class="step c4">
+        <h3>Click every button in the pad</h3>
+        <p>Move into the test pad and click left, right and middle, then press the thumb buttons if your mouse has them. Each one lights on the diagram and ticks off in the tally.</p>
+        <p>A button that clicks physically but never lights is a failed switch or a broken solder joint, and on side buttons it is often just a driver profile that has unbound them.</p>
+      </li>
+      <li class="step c4">
+        <h3>Scroll, and scroll back</h3>
+        <p>Roll the wheel slowly in both directions, then press it in for middle click and tilt it sideways if it tilts. Each notch shows up as a step.</p>
+        <p>A wheel that occasionally jumps the wrong way has a dirty or worn encoder. Scrolling slowly makes it obvious in a way that fast scrolling hides.</p>
+      </li>
+      <li class="step c4">
+        <h3>Run the chatter and rate checks</h3>
+        <p>Click the same button twenty times, deliberately and slowly. The chatter check flags any pair of clicks arriving too close together to be human.</p>
+        <p>Then sweep the mouse steadily across the pad to measure polling rate. Higher is smoother, but what matters most is that it stays steady rather than collapsing.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- faq -->
+  <section class="section" id="faq" aria-labelledby="h-faq">
+    <div class="section__head">
+      <h2 id="h-faq">Questions people ask</h2>
+      <p>Double clicks you did not make, side buttons that ignore you, and what polling rate really tells you.</p>
+    </div>
+    <div class="faq">
+    <details open>
+      <summary>What is double-click chatter and how do I test for it?</summary>
+      <div class="faq__a">
+        <p>Chatter is a worn or dirty switch sending two clicks from one press. It is the single most common mouse fault, and it shows up as files opening when you meant to select them, or dragging that drops halfway.</p>
+        <p>Click one button twenty times slowly and watch the chatter counter. Any interval under about 50 milliseconds is faster than a human can click, so each one flagged is the switch misbehaving rather than you.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can I fix a mouse that double clicks?</summary>
+      <div class="faq__a">
+        <p>Often, yes. Many switches fail because of oxidation on the contacts rather than mechanical wear, and working the button hard a few hundred times sometimes clears it temporarily. Contact cleaner applied inside the switch works better and lasts longer.</p>
+        <p>The permanent fix is replacing the switch, which is a cheap part but needs soldering. Check the warranty first, because several manufacturers cover this fault for years and it is a known defect on some popular models.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why don't my side buttons register?</summary>
+      <div class="faq__a">
+        <p>The usual cause is software rather than hardware. Manufacturer utilities from Logitech, Razer, Corsair and others often bind side buttons to macros or profile switching, and those never reach the browser as ordinary button events.</p>
+        <p>Set the buttons back to their default forward and back actions in that software and retest. If they still do nothing here but work elsewhere, the browser is filtering them; if they do nothing anywhere, the switch has failed.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What is polling rate and does a higher one matter?</summary>
+      <div class="faq__a">
+        <p>Polling rate is how often the mouse reports its position, measured in Hz. 125 Hz means eight milliseconds between updates; 1000 Hz means one.</p>
+        <p>Above about 500 Hz the returns diminish sharply for most people. What matters more is consistency: a rate that swings wildly points at a failing cable, a congested USB hub, or wireless interference.</p>
+      </div>
+    </details>
+    <details>
+      <summary>How accurate is the polling rate shown here?</summary>
+      <div class="faq__a">
+        <p>Treat it as an indication rather than a measurement. Browsers coalesce mouse events and tie them to the display refresh, so a 1000 Hz mouse often reports lower here even when it is working perfectly.</p>
+        <p>Use it to compare a mouse against itself over time, or to spot a rate that collapses during movement. For an exact figure, use a dedicated desktop utility.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Does this test measure DPI or sensor accuracy?</summary>
+      <div class="faq__a">
+        <p>No, and no web page can measure DPI reliably. The browser reports movement in CSS pixels after the operating system has already applied pointer acceleration and display scaling, so the raw sensor counts are gone before they arrive.</p>
+        <p>The movement trace is still useful for spotting jitter, stutter and a sensor that loses tracking on a reflective surface.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why doesn't the right-click menu appear?</summary>
+      <div class="faq__a">
+        <p>It is suppressed inside the test pad on purpose, because the context menu would open over the diagram and swallow the button event before it could be read.</p>
+        <p>Right-click works normally everywhere else on the page. Move the pointer outside the pad if you need the menu.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can I test a trackpad or a trackball?</summary>
+      <div class="faq__a">
+        <p>Yes. Both report the same events as a mouse, so buttons, scrolling and movement all register. Trackpad gestures arrive as scroll events, which is why two-finger scrolling shows up here.</p>
+        <p>Polling rate is not meaningful on a trackpad, since the numbers reflect the gesture engine rather than a sensor.</p>
+      </div>
+    </details>
+    <details>
+      <summary>My scroll wheel skips or jumps backwards.</summary>
+      <div class="faq__a">
+        <p>That is a worn optical encoder inside the wheel, and it is a common failure. Dust on the encoder wheel gives the same symptom and is worth ruling out first with compressed air.</p>
+        <p>Some mice have a free-spin mode that disengages the notched mechanism, so check you have not toggled it accidentally before assuming a fault.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Is my pointer movement being tracked?</summary>
+      <div class="faq__a">
+        <p>Only inside this page, only while it is open, and only to draw on screen. No coordinates, clicks or timings leave your browser, and nothing is stored.</p>
+      </div>
+    </details>
+    </div>
+  </section>
+
+  <!-- other tools -->
+  <section class="section" id="more" aria-labelledby="h-more">
+    <div class="section__head">
+      <h2 id="h-more">Test the rest of your setup</h2>
+      <p>Every tool runs in this tab, reads your hardware directly through the browser, and stores nothing.</p>
+    </div>
+    <div class="tools">
+    <a class="tool" href="/">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-gamepad"></use></svg><b>Gamepad</b></span>
+      <p>Check buttons, analog sticks, triggers, the D-pad and rumble, and measure stick drift.</p>
+    </a>
+    <a class="tool" href="/microphone-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-mic"></use></svg><b>Microphone</b></span>
+      <p>Live waveform, level meter in dBFS, noise floor reading, and instant record and playback.</p>
+    </a>
+    <a class="tool" href="/speaker-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-speaker"></use></svg><b>Speakers</b></span>
+      <p>Left and right channel checks, a tone generator, and a 20 Hz to 20 kHz hearing sweep.</p>
+    </a>
+    <a class="tool" href="/keyboard-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg><b>Keyboard</b></span>
+      <p>Light up a full layout key by key, read live key codes, and test N-key rollover.</p>
+    </a>
+    <a class="tool" href="/webcam-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-camera"></use></svg><b>Webcam</b></span>
+      <p>Live preview, real resolution and measured frame rate, camera switching and snapshots.</p>
+    </a>
+    <a class="tool" href="/screen-test">
+      <span class="tool__top"><svg aria-hidden="true"><use href="#i-display"></use></svg><b>Screen</b></span>
+      <p>Dead pixel hunt, backlight bleed check, gradient banding, and a measured refresh rate.</p>
+    </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav class="foot-links" aria-label="All tests">
+      <a href="/">Gamepad test</a>
+      <a href="/">Gamepad</a>
+      <a href="/microphone-test">Microphone</a>
+      <a href="/speaker-test">Speakers</a>
+      <a href="/keyboard-test">Keyboard</a>
+      <a href="/webcam-test">Webcam</a>
+      <a href="/screen-test">Screen</a>
+    </nav>
+    <div class="grid">
+      <p class="sig c6"><b>Melted Code</b> — browser hardware diagnostics</p>
+      <p class="foot-note c6">Runs entirely on your device. Nothing you press, say or show is recorded or uploaded.</p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  "use strict";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var statusEl = $("status"), statusText = $("statusText");
+  var pad = $("pad"), cv = $("trace"), ctx = cv.getContext("2d");
+
+  var css = getComputedStyle(document.documentElement);
+  var COL = {
+    signal: css.getPropertyValue("--signal").trim() || "#ff7a18",
+    analog: css.getPropertyValue("--analog").trim() || "#3ed0c4"
+  };
+
+  var NAMES = ["Left", "Middle", "Right", "Back", "Forward"];
+  var btnEls = {}, chipEls = {};
+  document.querySelectorAll("[data-mb]").forEach(function(el){
+    (btnEls[el.dataset.mb] = btnEls[el.dataset.mb] || []).push(el);
+  });
+  document.querySelectorAll("[data-chip]").forEach(function(el){ chipEls[el.dataset.chip] = el; });
+
+  var proven = {}, provenCount = 0;
+  var pts = [], raf = null;
+  var moveStamps = [], lastMove = 0;
+  var drumPos = 0, upN = 0, downN = 0, sideN = 0, revs = 0, lastDir = 0;
+  var clicks = 0, gaps = [], lastClick = 0, chatterN = 0;
+
+  /* ── canvas ────────────────────────────────────────────────────────── */
+  function sizePad(){
+    cv.style.height = Math.round(Math.max(220, Math.min(430, pad.clientWidth * 0.46))) + "px";
+  }
+  sizePad();
+  window.addEventListener("resize", sizePad);
+
+  function fit(){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !h) return null;
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)){
+      cv.width = Math.round(w * dpr);
+      cv.height = Math.round(h * dpr);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: w, h: h };
+  }
+
+  function draw(){
+    raf = requestAnimationFrame(draw);
+    var b = fit();
+    if (!b) return;
+    ctx.clearRect(0, 0, b.w, b.h);
+
+    var now = performance.now();
+    while (pts.length && now - pts[0].t > 2200) pts.shift();
+    if (pts.length < 2) return;
+
+    for (var i = 1; i < pts.length; i++){
+      var a = pts[i - 1], c = pts[i];
+      var age = (now - c.t) / 2200;
+      ctx.globalAlpha = Math.max(0, 1 - age) * 0.9;
+      ctx.strokeStyle = c.down ? COL.signal : COL.analog;
+      ctx.lineWidth = c.down ? 3 : 1.8;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(c.x, c.y);
+      ctx.stroke();
+    }
+
+    var last = pts[pts.length - 1];
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = last.down ? COL.signal : COL.analog;
+    ctx.beginPath();
+    ctx.arc(last.x, last.y, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  draw();
+
+  /* ── movement ──────────────────────────────────────────────────────── */
+  pad.addEventListener("pointermove", function(e){
+    var r = pad.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top;
+    pts.push({ x: x, y: y, t: performance.now(), down: e.buttons !== 0 });
+    if (pts.length > 900) pts.shift();
+
+    $("px").textContent = Math.round(x);
+    $("py").textContent = Math.round(y);
+    $("padHint").classList.add("gone");
+    $("ptype").textContent = e.pointerType || "mouse";
+    $("pdpr").textContent = (window.devicePixelRatio || 1).toFixed(2) + "x";
+
+    if (typeof e.movementX === "number"){
+      var step = Math.max(Math.abs(e.movementX), Math.abs(e.movementY));
+      if (step) $("pstep").textContent = step + " px";
+    }
+
+    var now = performance.now();
+    moveStamps.push(now);
+    while (moveStamps.length && now - moveStamps[0] > 1000) moveStamps.shift();
+    if (now - lastMove > 200){
+      lastMove = now;
+      $("hz").textContent = moveStamps.length ? moveStamps.length : "—";
+    }
+
+    statusEl.classList.add("is-live");
+    statusText.textContent = "Reading pointer input";
+  });
+
+  pad.addEventListener("pointerleave", function(){
+    $("padHint").classList.remove("gone");
+  });
+
+  /* ── buttons ───────────────────────────────────────────────────────── */
+  function mark(b){
+    if (proven[b]) return;
+    proven[b] = true;
+    provenCount++;
+    if (chipEls[b]) chipEls[b].classList.add("done");
+    $("btnNote").textContent = provenCount + " of 5 proven";
+  }
+
+  function paintButtons(mask){
+    for (var b = 0; b <= 4; b++){
+      var bit = b === 0 ? 1 : b === 1 ? 4 : b === 2 ? 2 : b === 3 ? 8 : 16;
+      var on = (mask & bit) !== 0;
+      if (btnEls[b]) btnEls[b].forEach(function(el){ el.classList.toggle("on", on); });
+    }
+    var held = [];
+    if (mask & 1) held.push("Left");
+    if (mask & 4) held.push("Middle");
+    if (mask & 2) held.push("Right");
+    if (mask & 8) held.push("Back");
+    if (mask & 16) held.push("Forward");
+    $("pbtn").textContent = held.length ? held.join(" + ") : "none";
+  }
+
+  pad.addEventListener("pointerdown", function(e){
+    e.preventDefault();
+    mark(e.button);
+    paintButtons(e.buttons);
+    $("padNote").textContent = (NAMES[e.button] || ("Button " + e.button)) + " down";
+  });
+
+  pad.addEventListener("pointerup", function(e){ paintButtons(e.buttons); });
+  pad.addEventListener("pointercancel", function(){ paintButtons(0); });
+  window.addEventListener("pointerup", function(e){ if (e.target !== pad) paintButtons(e.buttons); });
+  pad.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+  pad.addEventListener("auxclick", function(e){ e.preventDefault(); });
+  pad.addEventListener("mousedown", function(e){ if (e.button === 1) e.preventDefault(); });
+
+  /* ── wheel ─────────────────────────────────────────────────────────── */
+  var wheelTimer = null;
+  pad.addEventListener("wheel", function(e){
+    e.preventDefault();
+
+    var dy = e.deltaY, dx = e.deltaX;
+    var unit = e.deltaMode === 1 ? "lines" : e.deltaMode === 2 ? "pages" : "px";
+    $("wDelta").textContent = Math.round(dy) + " / " + Math.round(dx) + " " + unit;
+
+    if (Math.abs(dy) > 0){
+      var dir = dy < 0 ? 1 : -1;
+      if (dir > 0){ upN++; $("wUpN").textContent = upN; }
+      else { downN++; $("wDownN").textContent = downN; }
+      if (lastDir && dir !== lastDir){ revs++; $("wRev").textContent = revs; }
+      lastDir = dir;
+
+      $(dy < 0 ? "wUp" : "wDown").classList.add("on");
+      drumPos = (drumPos + dy * 0.35) % 18;
+      $("drum").style.transform = "translateY(" + drumPos.toFixed(1) + "px)";
+    }
+    if (Math.abs(dx) > 0){
+      sideN++;
+      $("wSide").textContent = sideN;
+      $(dx < 0 ? "wLeft" : "wRight").classList.add("on");
+    }
+
+    $("wheelNote").textContent = "scrolling";
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(function(){
+      ["wUp","wDown","wLeft","wRight"].forEach(function(id){ $(id).classList.remove("on"); });
+      $("wheelNote").textContent = "idle";
+      verdictWheel();
+    }, 160);
+  }, { passive: false });
+
+  function verdictWheel(){
+    var box = $("wheelBox");
+    if (upN >= 5 && downN >= 5 && revs <= Math.ceil((upN + downN) / 12)){
+      box.className = "note ok";
+      $("wheelMsg").textContent = "Both directions register cleanly with no unexpected reversals.";
+    } else if (revs > (upN + downN) / 5 && upN + downN > 12){
+      box.className = "note warn";
+      $("wheelMsg").textContent = "The wheel is reversing direction more often than your scrolling explains. That points at a dirty or worn encoder.";
+    }
+  }
+
+  /* ── chatter ───────────────────────────────────────────────────────── */
+  $("clicker").addEventListener("click", function(){
+    var now = performance.now();
+    clicks++;
+    $("clickCount").textContent = clicks;
+
+    if (lastClick){
+      var gap = now - lastClick;
+      gaps.push(gap);
+      var min = Math.min.apply(null, gaps);
+      var avg = gaps.reduce(function(a, b){ return a + b; }, 0) / gaps.length;
+      $("chatMin").textContent = Math.round(min) + " ms";
+      $("chatAvg").textContent = Math.round(avg) + " ms";
+      if (gap < 50){
+        chatterN++;
+        $("chatN").textContent = chatterN;
+      }
+    }
+    lastClick = now;
+
+    var box = $("chatBox");
+    if (chatterN > 0){
+      box.className = "note warn";
+      $("chatMsg").textContent = chatterN + (chatterN === 1 ? " click pair" : " click pairs") +
+        " arrived too close together to be deliberate. That is the switch bouncing, and it is the classic failing-mouse symptom.";
+    } else if (clicks >= 20){
+      box.className = "note ok";
+      $("chatMsg").textContent = "Twenty clean clicks with no double registrations. This switch is healthy.";
+    }
+  });
+
+  $("chatReset").addEventListener("click", function(){
+    clicks = 0; gaps = []; lastClick = 0; chatterN = 0;
+    $("clickCount").textContent = "0";
+    $("chatN").textContent = "0";
+    $("chatMin").textContent = $("chatAvg").textContent = "—";
+    $("chatBox").className = "note";
+    $("chatMsg").textContent = "Anything under 50 ms is faster than a human can click, so each one flagged is the switch bouncing rather than you.";
+  });
+
+  window.addEventListener("pagehide", function(){ if (raf) cancelAnimationFrame(raf); });
+})();
+
+</script>
+</body>
+</html>
